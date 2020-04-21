@@ -1,0 +1,4 @@
+{:min-level :info
+ :ns-whitelist ["madek.media-service.*"]
+ :ns-blacklist []
+ }

@@ -1,0 +1,22 @@
+name: MADEK/madek/media-service
+windows:
+  2:
+    name: back-repl-run
+    command: |
+      export DB_NAME=madek
+      export LOGGING_CONFIG_FILE=log-conf-dev.edn
+      # we need do wait for the front-end to build the assets before we start up
+      sleep 30
+      ./bin/clj-run run
+  3:
+    name: front-repl-run
+    command: |
+      ./bin/cljs-watch-app
+  5:
+    name: psql
+    command: |
+      psql -d madek_v3
+  6:
+    name: datalayer
+    command: |
+      cd datalayer

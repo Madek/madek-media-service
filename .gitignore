@@ -1,0 +1,14 @@
+.DS_Store
+.cpcache
+.java-version
+.nrepl-port
+.shadow-cljs
+log/
+madek-media-service.jar
+madek-media-service_aot.jar
+node_modules/
+pom.xml
+resources/build-timestamp.txt
+resources/media-service/public/js/
+tmp/
+tmux-client*.log

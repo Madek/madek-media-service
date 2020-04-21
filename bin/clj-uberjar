@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euxo
+clojure -Spom
+clojure -A:depstar:resources -m hf.depstar.uberjar madek-media-service.jar -C -m madek.media-service.main

@@ -1,0 +1,65 @@
+{:paths ["src/all" "resources"]
+ :deps
+ {;
+  byte-streams/byte-streams {:mvn/version "0.2.5-alpha2"}
+  camel-snake-kebab {:mvn/version "0.4.2"}
+  cheshire {:mvn/version "5.10.1"}
+  cli-matic {:mvn/version "0.4.3"}
+  clj-commons/clj-yaml {:mvn/version "0.7.107"}
+  cljs-http/cljs-http {:mvn/version "0.1.46"}
+  cljc.java-time/cljc.java-time {:mvn/version "0.1.16"}
+  clojure-humanize/clojure-humanize {:mvn/version "0.2.2"}
+  com.codahale.metrics/metrics-core {:mvn/version "3.0.2"}
+  com.codahale.metrics/metrics-healthchecks {:mvn/version "3.0.2"}
+  com.fzakaria/slf4j-timbre {:mvn/version "0.3.21"}
+  com.github.seancorfield/honeysql {:mvn/version "2.0.0-rc2"}
+  com.lucasbradstreet/cljs-uuid-utils {:mvn/version "1.0.2"}
+  com.taoensso/sente {:mvn/version "1.16.2"}
+  com.taoensso/timbre {:mvn/version "5.1.2"}
+  compojure/compojure {:mvn/version "1.6.2"}
+  digest {:mvn/version "1.4.10"}
+  environ {:mvn/version "1.2.0"}
+  hiccup {:mvn/version "1.0.5"}
+  hikari-cp {:mvn/version "2.13.0"}
+  http-kit {:mvn/version "2.5.3"}
+  inflections {:mvn/version "0.13.2"}
+  logbug {:mvn/version "5.0.0"}
+  metosin/reitit {:mvn/version "0.5.15"}
+  nilenso/honeysql-postgres {:mvn/version  "0.4.112"
+                             :exclusions []}
+  nrepl/nrepl {:mvn/version "0.8.3"}
+  org.clojure/core.async {:mvn/version "1.3.618"}
+  org.clojure/core.memoize {:mvn/version "1.0.250"}
+  org.clojure/data.codec {:mvn/version "0.1.1"}
+  org.clojure/tools.cli {; :multi option is not yet released
+                         ; :mvn/version "1.0.194"
+                         :git/url "https://github.com/clojure/tools.cli"
+                         :sha "2bdef0a335e2e6751dc8964c04f7db0130a5c20e"}
+  org.clojure/tools.logging {:mvn/version "1.1.0"}
+  pg-types {:mvn/version  "3.0.0"}
+  reagent/reagent {:mvn/version "1.1.0"}
+  ring-middleware-accept {:mvn/version "2.0.3"}
+  ring/ring-core {:mvn/version "1.9.4"}
+  ring/ring-json {:mvn/version "0.5.1"}
+  timothypratley/patchin {:mvn/version "0.3.5"}
+  tick {:mvn/version "0.4.32"}
+  }
+ :aliases
+ {;
+  :cljs {:extra-deps {thheller/shadow-cljs {:mvn/version "2.15.3"}}}
+  :depstar {:extra-deps {seancorfield/depstar {:mvn/version "2.0.216"}}}
+  :graph {:extra-deps
+          {org.clojure/tools.deps.graph
+           {;:local/root "/Users/thomas/Programming/CLOJURE/tools.deps.graph"
+            :git/url  "https://github.com/DrTom/tools.deps.graph.git"
+            :sha "809d5981b6c6ec7267328b74f8dd61630df01daf" }}
+          :main-opts ["-m" "clojure.tools.deps.graph"]}
+  :nREPL {:extra-deps {nrepl/nrepl {:mvn/version "0.8.3"}}}
+  :outdated {:extra-deps {olical/depot {:mvn/version "2.3.0"}}
+             :main-opts ["-m" "depot.outdated.main"]}
+  :resources {:extra-paths ["resources"]}
+  :test {:extra-paths ["test"]
+         :extra-deps {com.cognitect/test-runner
+                      {:git/url "https://github.com/cognitect-labs/test-runner.git"
+                       :sha "4e7e1c0dfd5291fa2134df052443dc29695d8cbe"}}
+         :main-opts ["-m" "cognitect.test-runner"]}}}

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euxo
+rm -rf resources/media-service/public/js/
+npx shadow-cljs release app
+rm -rf resources/media-service/public/js/cljs-runtime/
