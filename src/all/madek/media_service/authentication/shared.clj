@@ -17,7 +17,13 @@
                               (sql/from :admins)
                               (sql/where [:= :admins.user_id :users.id]))
                           ] true
-                   :else false) :is_admin])
+                   :else false) :is_admin]
+        [(sql/call :case [:exists
+                          (-> (sql/select 1)
+                              (sql/from :system_admins)
+                              (sql/where [:= :system_admins.user_id :users.id]))
+                          ] true
+                   :else false) :is_system_admin])
       (sql/merge-join :people [:= :users.person_id :people.id])))
 
 

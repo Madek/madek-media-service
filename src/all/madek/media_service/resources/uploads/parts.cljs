@@ -7,10 +7,10 @@
     [clojure.set :refer [rename-keys]]
     [madek.media-service.common.forms.core :as forms]
     [madek.media-service.common.http-client.core :as http-client]
-    [madek.media-service.constants :refer [MIN_PART_SIZE MAX_PART_SIZE]]
+    [madek.media-service.constants :refer []]
     [madek.media-service.routes :as routes :refer [path]]
     [madek.media-service.state :as state :refer [debug?* hidden-routing-state-component]]
-    [madek.media-service.utils.core :refer [keyword presence str]]
+    [madek.media-service.utils.core :refer [keyword presence presence! str]]
     [reagent.core :as reagent :refer [atom]]
     [taoensso.timbre :as logging])
   (:require-macros
@@ -69,7 +69,9 @@
 (async/pipe part-md5-worker-done part-upload-queue)
 
 (defn create-part [index start upload*]
-  (let [size (min MAX_PART_SIZE
+  (let [MAX_PART_SIZE (-> @upload* :media_store :upload_max_part_size presence!)
+        MIN_PART_SIZE (-> @upload* :media_store :upload_min_part_size presence!)
+        size (min MAX_PART_SIZE
                   (max MIN_PART_SIZE (-> (:size @upload*) (/ 3) Math/floor))
                   (- (:size @upload*) start))
         end (+ start size)]

@@ -14,6 +14,7 @@
     [madek.media-service.db :as db]
     [madek.media-service.http.static-resources :as static-resources]
     [madek.media-service.resources.originals.original.main :as original]
+    [madek.media-service.resources.settings.main :as settings]
     [madek.media-service.resources.spa-back :as spa]
     [madek.media-service.resources.stores.main :as stores]
     [madek.media-service.resources.stores.store.groups.group.main :as store-group]
@@ -61,6 +62,7 @@
    :upload-part #'uploads/handler
    :upload-start #'uploads/handler
    :uploads #'uploads/handler
+   :settings #'settings/handler
    :ws #'ws/handler })
 
 (defn route-resolve [handler request]
@@ -117,6 +119,7 @@
       wrap-route-dispatch
       (logbug.ring/wrap-handler-with-logging :info)
       spa/wrap
+      settings/wrap-assoc-settings
       authentication/wrap
       (logbug.ring/wrap-handler-with-logging :info)
       wrap-route-resolve

@@ -19,6 +19,7 @@
 (defn down [] (FontAwesomeIcon #js{:icon fa-free-solid-svg-icons/faCaretSquareDown :className ""}))
 (defn edit [] (FontAwesomeIcon #js{:icon fa-free-solid-svg-icons/faPen :className ""}))
 (defn original [] (FontAwesomeIcon #js{:icon fa-free-solid-svg-icons/faFile :className ""}))
+(defn reset [] (FontAwesomeIcon #js{:icon fa-free-solid-svg-icons/faTimes :className ""}))
 (defn save [] (FontAwesomeIcon #js{:icon fa-free-solid-svg-icons/faSave :className ""}))
 (defn stop [] (FontAwesomeIcon #js{:icon fa-free-solid-svg-icons/faMinusSquare :className ""}))
 (defn sync [] (FontAwesomeIcon #js{:icon fa-free-solid-svg-icons/faSync :className "" :spin true}))

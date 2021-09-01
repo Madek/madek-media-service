@@ -32,28 +32,7 @@
         (sql/join :groups_users [:= :media_stores_groups.group_id :groups_users.group_id])
         (sql/join :users [:= :groups_users.user_id :users.id]))))
 
-;(first  (jdbc/query @db/ds* (sql-format users-media-stores-query)))
-
-
-(comment
-  (jdbc/query @db/ds*
-              (sql-format
-                (-> (sql/select :priority :user_id :media_store_id)
-                    (sql/from [users-media-stores-query :usm])
-                    (sql/where [:= :user_id "653bf621-45c8-4a23-a15e-b29036aa9b10"])
-                    ))))
-
 (def users-media-store-priority-query
   (-> (sql/select [:%max.priority :priority] :user_id :media_store_id)
       (sql/from [users-media-stores-query :usm])
       (sql/group-by :usm.user_id :media_store_id)))
-
-(comment
-  (jdbc/query @db/ds*
-              (sql-format
-                (-> (sql/select [:%max.priority :priority] :user_id :media_store_id)
-                    (sql/from [users-media-stores-query :usm])
-                    (sql/group-by :usm.user_id :media_store_id)
-                    (sql/where [:= :user_id "653bf621-45c8-4a23-a15e-b29036aa9b10"])
-                    ))))
-

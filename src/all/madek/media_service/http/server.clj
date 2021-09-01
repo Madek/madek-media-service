@@ -3,7 +3,7 @@
   (:require
     [clojure.tools.logging :as logging]
     [environ.core :refer [env]]
-    [madek.media-service.constants :refer [MAX_PART_SIZE DEFAULT_MAX_BODY_SIZE]]
+    [madek.media-service.constants :refer [MAX_BODY_SIZE]]
     [madek.media-service.utils.cli-options :refer [long-opt-for-key]]
     [madek.media-service.utils.core :refer [keyword presence str]]
     [org.httpkit.server :as http-kit]))
@@ -54,7 +54,7 @@
             {:ip (http-server-bind-key @options*)
              :port (http-server-port-key @options*)
              :thread (http-server-threads-key @options*)
-             :max-body (max DEFAULT_MAX_BODY_SIZE MAX_PART_SIZE)
+             :max-body MAX_BODY_SIZE
              :worker-name-prefix "http-server-worker-"}))
   (logging/info "started HTTP server"))
 

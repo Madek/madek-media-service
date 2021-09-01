@@ -7,7 +7,7 @@
     [clojure.set :refer [rename-keys]]
     [madek.media-service.common.forms.core :as forms]
     [madek.media-service.common.http-client.core :as http-client]
-    [madek.media-service.constants :refer [MIN_PART_SIZE MAX_PART_SIZE]]
+    [madek.media-service.constants :refer []]
     [madek.media-service.icons :as icons]
     [madek.media-service.resources.uploads.parts :as parts]
     [madek.media-service.routes :as routes :refer [path]]
@@ -51,7 +51,7 @@
 
 ;;; queues and chaining ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defonce files* (reagent/atom []))
+(defonce uploads* (reagent/atom []))
 
 (defonce start-queue (async/chan))
 
@@ -66,7 +66,7 @@
 
 (defonce wait-finished-queue (async/chan))
 
-(defn queue [file*] (async/put! start-queue file*))
+(defn queue [upload*] (async/put! start-queue upload*))
 
 (async/pipe start-queue md5-worker-queue)
 (async/pipe md5-worker-done announce-queue)
@@ -78,12 +78,12 @@
 
 (defn _start-announce-worker []
   (go (while true
-        (let [file* (<! announce-queue)]
-          (logging/info 'annoucing @file*)
+        (let [upload* (<! announce-queue)]
+          (logging/info 'annoucing @upload*)
           (when-let [data (some-> {:chan (async/chan)
                                    :method :post
                                    :url (routes/path :uploads)
-                                   :json-params (-> @file*
+                                   :json-params (-> @upload*
                                                     (select-keys [:size :name :type :md5])
                                                     (rename-keys {:type :content_type
                                                                   :name :filename})
@@ -92,8 +92,13 @@
                                   :chan <! http-client/filter-success!
                                   :body)]
             (logging/info 'data data)
-            (swap! file* merge (select-keys data [:id :media_store_id :state]))
-            (>! announce-done file*))))))
+            (let [media-store-id (:media_store_id data)]
+              (swap! upload* merge
+                     (select-keys data [:id :media_store_id :state])
+                     {:media_store (->> @data* :stores
+                                        (filter #(= media-store-id (:media_store_id %)))
+                                        first)}))
+            (>! announce-done upload*))))))
 
 (def start-announce-worker (memoize _start-announce-worker))
 
@@ -102,19 +107,19 @@
 
 (defn _start-md5-worker []
   (go (while true
-        (let [file* (<! md5-worker-queue)
+        (let [upload* (<! md5-worker-queue)
               done* (atom false)]
-          (logging/info 'md5 @file*)
-          (.md5 (bmf.) (:file @file*)
+          (logging/info 'md5 @upload*)
+          (.md5 (bmf.) (:file @upload*)
                 (fn [err, md5]
                   (reset! done* true)
                   (if err
-                    (swap! file* assoc :err err)
+                    (swap! upload* assoc :err err)
                     (do
-                      (swap! file* assoc :md5 md5))))
-                #(swap! file* assoc :md5-progress %))
+                      (swap! upload* assoc :md5 md5))))
+                #(swap! upload* assoc :md5-progress %))
           (while (not @done*) (<! (async/timeout 200)))
-          (>! md5-worker-done file*)))))
+          (>! md5-worker-done upload*)))))
 
 (defonce start-md5-worker (memoize _start-md5-worker))
 
@@ -158,18 +163,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn file-input-handler [e]
-  ;(reset! files* [])
+  ;(reset! uploads* [])
   (doseq [^js/File file (.. e -target -files)]
-    (let [file* (reagent/atom {:file file
+    (let [upload* (reagent/atom {:file file
                                :type (.-type file)
                                :name (.-name file)
                                :err nil
                                :size (.-size file)
                                :md5-progress 0
-                               :index (count @files*)
+                               :index (count @uploads*)
                                })]
-      (swap! files* conj file*)
-      (queue file*))))
+      (swap! uploads* conj upload*)
+      (queue upload*))))
 
 (defn file-upload-component []
   [:div.form
@@ -197,8 +202,8 @@
       [:h4 "data*"]
       [:pre (with-out-str (pprint @data*))]]
      [:div.files
-      [:h4 "files*"]
-      [:pre (with-out-str (pprint @files*))]]
+      [:h4 "uploads*"]
+      [:pre (with-out-str (pprint @uploads*))]]
      [:hr]]))
 
 
@@ -211,18 +216,18 @@
    [:h2 "Uploads"]
    [file-upload-component]
    [:div [:h3 "Uploads"]
-    [:ol (doall (for [file* @files*]
-                  ^{:key (:index @file*)}
+    [:ol (doall (for [upload* @uploads*]
+                  ^{:key (:index @upload*)}
                   [:li
                    [:h4 "Upload"]
-                   (when-let [original-id (:media_file_id @file*)]
+                   (when-let [original-id (:media_file_id @upload*)]
                      [:a {:href (path :original {:original-id original-id})}
                       [icons/original] " Original "])
-                   [:pre (with-out-str (pprint (dissoc @file* :parts)))]
+                   [:pre (with-out-str (pprint (dissoc @upload* :parts)))]
                    [:div
                     [:h5 "Parts" ]
 
-                    [:ol (doall (for [part* (:parts @file*)]
+                    [:ol (doall (for [part* (:parts @upload*)]
                                   ^{:key (:part @part*)}
                                   [:li [:pre (with-out-str (pprint @part*))]]
                                   ))]]]))]]

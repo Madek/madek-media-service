@@ -32,10 +32,6 @@
                    :groups_count])))
 
 
-(comment (jdbc/query @db/ds* (sql-format stores-query)))
-
-(comment (spit "tmp/stores.sql" (first (sql-format stores-query))))
-
 (defn stores [{tx :tx :as request}]
   {:body {:stores (-> stores-query sql-format
                       (->> (jdbc/query tx)))}})

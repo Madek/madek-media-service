@@ -3,6 +3,7 @@
   (:require
     [clojure.pprint :refer [pprint]]
     [madek.media-service.resources.originals.original.main :as original]
+    [madek.media-service.resources.settings.main :as settings]
     [madek.media-service.resources.stores.main :as stores]
     [madek.media-service.resources.stores.store.groups.main :as store-groups]
     [madek.media-service.resources.stores.store.users.main :as store-users]
@@ -21,6 +22,7 @@
 
 (def resolve-table
   {:uploads #'uploads/page
+   :settings #'settings/page
    :stores #'stores/page
    :store-users #'store-users/page
    :store-groups #'store-groups/page

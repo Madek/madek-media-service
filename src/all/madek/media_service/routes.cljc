@@ -21,6 +21,8 @@
       ["/content" {:name :original-content
                    :bypass-spa true}]
       ["" :original]]]
+    ["settings/" {:authenticators #{:system-admins}}
+     ["" {:name :settings}]]
     ["stores/"
      ["" {:name :stores}]
      [":store-id"

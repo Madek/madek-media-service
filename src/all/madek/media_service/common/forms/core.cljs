@@ -5,6 +5,7 @@
   (:require
     [clojure.pprint :refer [pprint]]
     [clojure.string :as string]
+    [madek.media-service.constants :as constants :refer [TAB-INDEX]]
     [madek.media-service.icons :as icons]
     [madek.media-service.routes :refer [path navigate!]]
     [madek.media-service.state :refer [routing-state*]]
@@ -13,7 +14,6 @@
     [taoensso.timbre :as logging]))
 
 
-(def TAB-INDEX 100)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -34,7 +34,7 @@
 (defn submit-component
   [& {:keys [outer-classes btn-classes icon inner disabled]
       :or {outer-classes [:mb-3]
-           btn-classes [:btn-danger]
+           btn-classes []
            inner [:span "Just Do It"]
            icon [:i.fas.fa-question]
            disabled false}}]
@@ -62,7 +62,7 @@
 (defn input-component
   [data* ks & {:keys [label hint type element placeholder disabled rows
                       on-change post-change
-                      prepend append ]
+                      prepend append reset-default]
                :or {label (last ks)
                     hint nil
                     disabled false
@@ -72,7 +72,8 @@
                     on-change identity
                     post-change identity
                     prepend nil
-                    append nil}}]
+                    append nil
+                    reset-default nil}}]
   [:div.form-group
    [:label {:for (last ks)}
     (if (= label (last ks))
@@ -94,7 +95,17 @@
       :disabled disabled
       :rows rows
       :auto-complete :off}]
-    (when append [append])]
+    (when append [append])
+    (when reset-default
+      [:div.input-group-append.reset
+       [:button.btn.btn-outline-secondary
+        {:disabled disabled
+         :on-click (fn [e]
+                     (.preventDefault e)
+                     (swap! data* assoc-in ks reset-default))
+         :tab-index constants/TAB-INDEX }
+        [:span [icons/reset] " Reset to default"]]])]
+
    (when hint [:small.form-text hint])])
 
 

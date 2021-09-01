@@ -139,6 +139,20 @@
       (doseq [hook (:after-tx response)] (hook))
       response)))
 
+(defn files->versions [dir]
+  (-> dir
+      clojure.java.io/file
+      file-seq
+      (->> (filter #(and (.isFile %)
+                         (= (.getParent %) dir)))
+           (map (fn [f]
+                  (-> f
+                      .getName
+                      (clojure.string/split #"_")
+                      first
+                      Integer.)))
+           (into #{}))))
+
 (defn check-pending-migrations [ds]
   (let [run-versions (-> (sql/select :version)
                          (sql/from :schema_migrations)
@@ -146,19 +160,10 @@
                          (->> (jdbc/query ds)
                               (map #(-> % :version Integer.))
                               (into #{})))
-        migrations-dir "database/db/migrate"
-        files-versions (-> migrations-dir
-                           clojure.java.io/file
-                           file-seq
-                           (->> (filter #(and (.isFile %)
-                                              (= (.getParent %) migrations-dir)))
-                                (map (fn [f]
-                                       (-> f
-                                           .getName
-                                           (clojure.string/split #"_")
-                                           first
-                                           Integer.)))
-                                (into #{})))
+        migrations-dirs ["database/db/migrate" "database/db/migrate_new"]
+        files-versions (reduce
+                         (fn [agg dir] (clojure.set/union agg (files->versions dir)))
+                         #{} migrations-dirs)
         pending-versions (clojure.set/difference files-versions run-versions)]
     (if-not (empty? pending-versions)
       (throw (Exception. "pending migrations!")))))

@@ -27,8 +27,6 @@
 
 (defonce last-query* (atom nil))
 
-(:comment (spit "tmp/query.sql" (sql-format @last-query* {:inline true})))
-
 (defn sub-select-priority [store-id]
   (-> (sql/select :priority)
       (sql/from :media_stores_groups)

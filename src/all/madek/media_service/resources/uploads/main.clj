@@ -46,12 +46,18 @@
 ;;; upload ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn uploads
-  [{:as request tx :tx
-    {user-id :user_id} :authenticated-entity }]
+  [{tx :tx media-service-settings :media-service-settings
+    {user-id :user_id} :authenticated-entity
+    :as request}]
   {:body
    {:stores (-> stores-sql/users-media-store-priority-query
                 (sql/where [:= :user_id user-id])
-                sql-format (->> (jdbc/query tx)))}})
+                sql-format
+                (->> (jdbc/query tx)
+                     (map (fn [store]
+                            (merge {}
+                                   (select-keys media-service-settings [:upload_min_part_size :upload_max_part_size])
+                                   store)))))}})
 
 (defn get-upload! [{{{upload-id :upload-id} :path-params} :route
                     current-user :authenticated-entity

@@ -20,12 +20,9 @@
       (sql/join :people [:= :people.id :users.person_id])
       (sql/select :last_name :first_name [:people.id :person_id])
       (sql/order-by :last_name :first_name :people.id)
-
       ))
 
 (defonce last-query* (atom nil))
-
-(:comment (spit "tmp/query.sql" (sql-format @last-query* {:inline true})))
 
 (defn sub-select-direct-priority [store-id]
   (-> (sql/select :priority)

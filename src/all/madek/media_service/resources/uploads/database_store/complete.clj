@@ -13,10 +13,6 @@
     [taoensso.timbre :as logging])
   (:import [java.security MessageDigest]))
 
-(comment
-  (MessageDigest/getInstance "SHA-256")
-  (MessageDigest/getInstance "MD5"))
-
 (defn next-completed-upload
   [& {:keys [tx]
       :or {tx @db/ds*}}]

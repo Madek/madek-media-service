@@ -5,6 +5,7 @@
     [taoensso.timbre :as timbre :refer [debug info]]
     [clojure.tools.logging :as logging]
     [madek.media-service.db :as db]
+    [madek.media-service.resources.settings.main :as settings]
     [madek.media-service.http.server :as http-server]
     [madek.media-service.logging :as service-logging]
     [madek.media-service.repl :as repl]
@@ -68,6 +69,7 @@
                 (repl/init options)
                 (db/init options)
                 (db-store-complete/init)
+                (settings/init)
                 (init-http)))))
 
 ;;; development ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -76,6 +78,7 @@
   (service-logging/init @options*)
   (state/init)
   (db-store-complete/init)
+  (settings/init)
   (init-http))
 
 ; reload/restart stuff when requiring this file in dev mode

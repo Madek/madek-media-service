@@ -1,13 +1,14 @@
 {:paths ["src/all" "resources"]
  :deps
  {;
+  buddy/buddy-sign {:mvn/version "3.4.1"}
   byte-streams/byte-streams {:mvn/version "0.2.5-alpha2"}
   camel-snake-kebab {:mvn/version "0.4.2"}
   cheshire {:mvn/version "5.10.1"}
   cli-matic {:mvn/version "0.4.3"}
   clj-commons/clj-yaml {:mvn/version "0.7.107"}
-  cljs-http/cljs-http {:mvn/version "0.1.46"}
   cljc.java-time/cljc.java-time {:mvn/version "0.1.16"}
+  cljs-http/cljs-http {:mvn/version "0.1.46"}
   clojure-humanize/clojure-humanize {:mvn/version "0.2.2"}
   com.codahale.metrics/metrics-core {:mvn/version "3.0.2"}
   com.codahale.metrics/metrics-healthchecks {:mvn/version "3.0.2"}

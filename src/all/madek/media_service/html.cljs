@@ -40,6 +40,7 @@
        [:> bs/NavDropdown.Item {:href (path :uploads)} [icons/upload] " Upload"]
        [:> bs/NavDropdown.Item {:href (path :madek-admin)} [icons/admin-interface] " Madek admin interface"]
        [:> bs/NavDropdown.Item {:href (path :stores)} [icons/admin-interface] " Media-Stores"]
+       [:> bs/NavDropdown.Item {:href (path :settings)} [icons/admin-interface] " Settings"]
        ])]])
 
 (defn footer []
