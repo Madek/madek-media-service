@@ -119,10 +119,10 @@
                     segment-end (if (< part-end end)
                                   (- part-size 1)
                                   (- end part-start))
-                    segment-length (- segment-end segment-start)]
+                    segment-length (inc (- segment-end segment-start))]
                 (logging/debug {:segment-start segment-start :segment-end segment-end :segment-length segment-length})
                 (send! ch (assoc response :body
-                                 (ByteBuffer/wrap  (:blob part) segment-start segment-length))
+                                 (ByteBuffer/wrap (:blob part) segment-start segment-length))
                        false)))
             (recur (inc i)))
           (send! ch (.getBytes "") true))))))

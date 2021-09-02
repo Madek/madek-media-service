@@ -1,6 +1,7 @@
 (ns madek.media-service.utils.http.anti-csrf-back
   (:refer-clojure :exclude [str keyword])
   (:require
+    [madek.media-service.authentication.token :refer [find-token-secret-in-header]]
     [madek.media-service.utils.core :refer [keyword presence str]]
     [madek.media-service.utils.http.shared :refer [ANTI_CRSF_TOKEN_COOKIE_NAME HTTP_UNSAVE_METHODS HTTP_SAVE_METHODS]]
     [logbug.debug]
@@ -19,6 +20,10 @@
       :authenticated-entity
       boolean not))
 
+(defn- token-in-header? [request]
+  (-> request
+      find-token-secret-in-header))
+
 (defn x-csrf-token! [request]
   (or (some-> request (get-in [:headers ANTI_CRSF_TOKEN_COOKIE_NAME]) presence)
       (some-> request :form-params :csrf-token presence)
@@ -31,7 +36,7 @@
 
 (defn anti-csrf-middleware [handler request]
   (let [anti-csrf-token (anti-csrf-token request)]
-    (when (http-unsafe? request)
+    (when (and (http-unsafe? request) (not token-in-header?))
       (when-not (presence anti-csrf-token)
         (throw (ex-info "The anti-csrf-token cookie value is not set." {:status 403})))
       (when-not (= anti-csrf-token (x-csrf-token! request))
