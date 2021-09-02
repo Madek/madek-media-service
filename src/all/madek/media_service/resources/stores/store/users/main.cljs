@@ -90,7 +90,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn combined-priority-component [user]
-  [:div
+  [:div.combined-priority-component
    (let [direct-priority (some-> user :direct_priority presence)
          group-priority (some-> user :groups_priority presence)
          combined-priority (some->> [direct-priority, group-priority]

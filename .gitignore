@@ -3,6 +3,7 @@
 .java-version
 .nrepl-port
 .shadow-cljs
+.ruby-gemset
 log/
 madek-media-service.jar
 madek-media-service_aot.jar
