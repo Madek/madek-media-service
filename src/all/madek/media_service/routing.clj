@@ -113,15 +113,35 @@
              (->> request :query-params
                   (map (fn [[k v]] [(keyword  k) (yaml/parse-string v)]))
                   (into {}))))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn authorize! [handler request]
+  (let [authorizers (get-in request [:route :data :authorizers] #{})]
+    (doseq [authorizer authorizers]
+      (case authorizer
+        :admin (when-not (get-in request [:authenticated-entity :is_admin])
+                 (throw (ex-info "Admin scope required" {:status 403})))
+        :user (when-not (get-in request [:authenticated-entity :user_id])
+                (throw (ex-info "Sign-in required" {:status 403})))
+        :system-admin (when-not (get-in request [:authenticated-entity :is_system_admin])
+                        (throw (ex-info "System-admin scope required" {:status 403})))))
+    (handler request)))
+
+(defn wrap-authorize! [handler]
+  (fn [request] (authorize! handler request)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn build-routes []
   (-> not-found-handler
       wrap-route-dispatch
-      (logbug.ring/wrap-handler-with-logging :info)
+      ;(logbug.ring/wrap-handler-with-logging :info)
+      wrap-authorize!
       spa/wrap
       settings/wrap-assoc-settings
       authentication/wrap
-      (logbug.ring/wrap-handler-with-logging :info)
+      ;(logbug.ring/wrap-handler-with-logging :info)
       wrap-route-resolve
       anti-csrf/wrap
       ring.middleware.json/wrap-json-response
@@ -129,7 +149,7 @@
       wrap-parsed-query-params
       ring.middleware.keyword-params/wrap-keyword-params
       ring.middleware.params/wrap-params
-      (logbug.ring/wrap-handler-with-logging :info)
+      ;(logbug.ring/wrap-handler-with-logging :info)
       wrap-accept
       ring.middleware.cookies/wrap-cookies
       db/wrap-tx

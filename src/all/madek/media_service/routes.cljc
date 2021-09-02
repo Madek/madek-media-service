@@ -13,41 +13,40 @@
 (def routes
   [["/" {:name :root}]
    ["/admin" {:name :madek-admin}]
-   ["/my" {:name :my :authenticators #{:user}}]
-   ["/media-service/" {:authenticators #{:user}}
+   ["/my" {:name :my :authorizers #{:user}}]
+   ["/media-service/" {:authorizers #{:user}}
     ["" :home]
     ["originals/"
      [":original-id"
       ["/content" {:name :original-content
                    :bypass-spa true}]
       ["" :original]]]
-    ["settings/" {:authenticators #{:system-admins}}
-     ["" {:name :settings}]]
-    ["stores/"
-     ["" {:name :stores}]
-     [":store-id"
-      ["" {:name :store}]
-      ["/groups/"
-       ["" {:name :store-groups}]
-       [":group-id" {:name :store-group}]
-       [":group-id/priority" {:name :store-group-priority}]]
-      ["/users/"
-       ["" {:name :store-users}]
-       [":user-id" {:name :store-user}]
-       [":user-id/direct-priority" {:name :store-user-direct-priority}]]]]
-    ["uploads/"
-     ["" {:name :uploads :authenticators #{:user}}]
-     [":upload-id"
-      ["" {:name :upload}]
-      ["/start" {:name :upload-start}]
-      ["/complete" {:name :upload-complete}]
-      ["/parts/"
-       ["" {:name :upload-parts}]
-       [":part" :upload-part]]]]
-    ["ws/" {:name :ws
-            :get :foo
-            :post :bar
-            :authenticators #{:user}}]]])
+    ["settings/" {:authorizers #{:system-admin}}
+     ["" {:name :settings}]
+     ["stores/" {:authorizers #{:system-admin}}
+      ["" {:name :stores}]
+      [":store-id"
+       ["" {:name :store}]
+       ["/groups/"
+        ["" {:name :store-groups}]
+        [":group-id" {:name :store-group}]
+        [":group-id/priority" {:name :store-group-priority}]]
+       ["/users/"
+        ["" {:name :store-users}]
+        [":user-id" {:name :store-user}]
+        [":user-id/direct-priority" {:name :store-user-direct-priority}]]]]
+     ["uploads/"
+      ["" {:name :uploads}]
+      [":upload-id"
+       ["" {:name :upload}]
+       ["/start" {:name :upload-start}]
+       ["/complete" {:name :upload-complete}]
+       ["/parts/"
+        ["" {:name :upload-parts}]
+        [":part" :upload-part]]]]
+     ["ws/" {:name :ws
+             :get :foo
+             :post :bar}]]]])
 
 (def router (reitit/router routes))
 
