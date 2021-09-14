@@ -40,7 +40,7 @@
 
 (defn term-filter [query {:as request}]
   (if-let [term (-> request :params :term presence)]
-    (sql/where query [:% (str term) :people.searchable])
+    (sql/where query [:ilike :people.searchable (str "%" term "%")])
     query))
 
 (defn users

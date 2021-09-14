@@ -119,7 +119,7 @@ describe "Resources" do
 
           it "returns filtered users" do
             expect(parsed_body).to eq({
-              "users": [
+              users: [
                 {
                   email: user.email,
                   first_name: user.person.first_name,
