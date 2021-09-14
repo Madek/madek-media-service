@@ -21,12 +21,7 @@
                              [:api_tokens.scope_write :token_scope_write]
                              [:api_tokens.revoked :token_revoked]
                              [:api_tokens.description :token_description])
-           (sql/merge-where [:= :api_tokens.token_hash secret;;(->> secrets (filter identity))
-                            ;;  (->> secrets
-                                  ;; (filter identity)
-                                  ;; (map hash-string))
-                                  ]
-                                  )
+           (sql/merge-where [:= :api_tokens.token_hash secret])
            (sql/merge-where [:<> :api_tokens.revoked true])
            (sql/merge-where (sql/raw "now() < api_tokens.expires_at"))
            (sql/merge-join :api_tokens [:= :users.id :api_tokens.user_id])
@@ -74,7 +69,7 @@
     (if-let [user-token (find-user-token-by-some-secret tx token-secret)]
       (authenticate user-token handler request)
       {:status 401
-      :body "No token for this token-secret found!"})
+       :body "No token for this token-secret found!"})
     (handler request)))
 
 (defn wrap [handler]
