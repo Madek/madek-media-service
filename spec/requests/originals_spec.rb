@@ -41,7 +41,6 @@ describe "Originals" do
       }
     end
   end
-  # let(:request) { faraday_client_with_token.get("originals/#{original_id}") }
   def upload_get_request
     faraday_client_with_token(json_response: true).get("settings/uploads/#{upload_id}")
   end
@@ -61,8 +60,7 @@ describe "Originals" do
     loop do
       media_file_id = upload_get_request.body["media_file_id"]
       break media_file_id if media_file_id.present?
-      puts "loop"
-      sleep 0.1
+      sleep 0.5
     end
   end
 
