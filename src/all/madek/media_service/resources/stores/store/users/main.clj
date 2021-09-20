@@ -64,7 +64,6 @@
                ))}}))
 
 (defn handler [{route-name :route-name method :request-method :as request}]
-  (logging/info 'request request)
   (case route-name
     :store-users (case method
                    (:get, :head) (users request)

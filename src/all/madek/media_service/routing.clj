@@ -13,6 +13,8 @@
     [madek.media-service.authentication :as authentication]
     [madek.media-service.db :as db]
     [madek.media-service.http.static-resources :as static-resources]
+    [madek.media-service.resources.analyzers.analyzer.main :as analyzer]
+    [madek.media-service.resources.analyzers.main :as analyzers]
     [madek.media-service.resources.originals.original.main :as original]
     [madek.media-service.resources.settings.main :as settings]
     [madek.media-service.resources.spa-back :as spa]
@@ -51,7 +53,9 @@
 ;;; routing ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def resolve-table
-  {:original #'original/handler
+  {:analyzers #'analyzers/handler
+   :analyzer #'analyzer/handler
+   :original #'original/handler
    :original-content #'original/handler
    :settings #'settings/handler
    :status #'status/handler
@@ -65,7 +69,7 @@
    :upload-part #'uploads/handler
    :upload-start #'uploads/handler
    :uploads #'uploads/handler
-   :ws #'ws/handler })
+   :ws #'ws/handler})
 
 (defn route-resolve [handler request]
   (if-let [route (routes/route (:uri request))]

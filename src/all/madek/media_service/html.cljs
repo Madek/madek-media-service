@@ -36,11 +36,12 @@
     [:> bs/Navbar.Brand {} "Madek Media-Service"]
     (when-let [user (-> @state* :user)]
       [:> bs/NavDropdown {:class "ml-auto" :title (str  (:first_name user) " " (:last_name user))}
-       [:> bs/NavDropdown.Item {:href (path :my)} " My archive"]
-       [:> bs/NavDropdown.Item {:href (path :uploads)} [icons/upload] " Upload"]
        [:> bs/NavDropdown.Item {:href (path :madek-admin)} [icons/admin-interface] " Madek admin interface"]
-       [:> bs/NavDropdown.Item {:href (path :stores)} [icons/admin-interface] " Media-Stores"]
+       [:> bs/NavDropdown.Item {:href (path :my)} " My archive"]
        [:> bs/NavDropdown.Item {:href (path :settings)} [icons/admin-interface] " Settings"]
+       [:> bs/NavDropdown.Item {:href (path :analyzers)} [icons/analyzers] " Analyzers "]
+       [:> bs/NavDropdown.Item {:href (path :stores)} [icons/stores] " Media-Stores"]
+       [:> bs/NavDropdown.Item {:href (path :uploads)} [icons/upload] " Upload"]
        ])]])
 
 (defn footer []

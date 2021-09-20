@@ -7,7 +7,7 @@
     [clojure.string :as string]
     [madek.media-service.constants :as constants :refer [TAB-INDEX]]
     [madek.media-service.icons :as icons]
-    [madek.media-service.routes :refer [path navigate!]]
+    [madek.media-service.routes :refer [path]]
     [madek.media-service.state :refer [routing-state*]]
     [madek.media-service.utils.core :refer [keyword presence str]]
     [reagent.core :as reagent :refer [atom]]
@@ -58,6 +58,32 @@
            args)])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn checkbox-component
+  [data* ks & {:keys [disabled hint label
+                      key pre-change post-change]
+               :or {disabled false
+                    hint nil
+                    label (last ks)
+                    key (last ks)
+                    pre-change identity
+                    post-change identity }}]
+  [:div.form-check.form-check
+   [:input.form-check-input
+    {:id key
+     :type :checkbox
+     :checked (boolean (get-in @data* ks))
+     :on-change #(-> @data* (get-in ks) boolean not
+                     pre-change
+                     (set-value data* ks)
+                     post-change)
+     :tab-index TAB-INDEX
+     :disabled disabled}]
+   [:label.form-check-label {:for key}
+    (if (= label (last ks))
+      [:strong label]
+      [:span [:strong  label] [:small " (" [:span.text-monospace (last ks)] ")"]])]
+   (when hint [:p [:small hint]]) ])
 
 (defn input-component
   [data* ks & {:keys [label hint type element placeholder disabled rows

@@ -28,12 +28,11 @@
   (http-client/route-cached-fetch data* :reload false))
 
 (defn put []
-  (logging/info :put)
   (go (when-let [res (some-> {:url url
-                         :method :patch
-                         :json-params (get @data* url)}
-                        http-client/request :chan <!
-                        http-client/filter-success :body)]
+                              :method :patch
+                              :json-params (get @data* url)}
+                             http-client/request :chan <!
+                             http-client/filter-success :body)]
         (swap! data* assoc url res :edit false))))
 
 (defn debug-component []

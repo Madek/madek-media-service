@@ -2,6 +2,8 @@
   (:refer-clojure :exclude [keyword str])
   (:require
     [clojure.pprint :refer [pprint]]
+    [madek.media-service.resources.analyzers.analyzer.main :as analyzer]
+    [madek.media-service.resources.analyzers.main :as analyzers]
     [madek.media-service.resources.originals.original.main :as original]
     [madek.media-service.resources.settings.main :as settings]
     [madek.media-service.resources.stores.main :as stores]
@@ -21,7 +23,9 @@
     ))
 
 (def resolve-table
-  {:uploads #'uploads/page
+  {:analyzers #'analyzers/page
+   :analyzer #'analyzer/page
+   :uploads #'uploads/page
    :settings #'settings/page
    :stores #'stores/page
    :store-users #'store-users/page

@@ -16,16 +16,19 @@
    ["/my" {:name :my :authorizers #{:user}}]
    ["/media-service/" {:authorizers #{:user}}
     ["" :home]
-    ["status" {:name :status
-               :authorizers ^:replace #{}
-               :bypass-spa true}]
+    ["analyzers/" {:authorizers #{:system-admin}}
+     ["" {:name :analyzers}]
+     [":analyzer-id" {:name :analyzer}]]
     ["originals/"
      [":original-id"
       ["/content" {:name :original-content
                    :bypass-spa true}]
       ["" :original]]]
     ["settings/" {:authorizers #{:system-admin}}
-     ["" {:name :settings}] ]
+     ["" {:name :settings}]]
+    ["status" {:name :status
+               :authorizers ^:replace #{}
+               :bypass-spa true}]
     ["stores/" {:authorizers #{:system-admin}}
      ["" {:name :stores}]
      [":store-id"
