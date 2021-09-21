@@ -95,6 +95,32 @@ describe "Originals" do
     end
   end
 
+  describe "GET: originals/:original_id/content?download=true" do
+    let(:request) { faraday_client_with_token.get("originals/#{original_id}/content", { download: true }) }
+    let(:response) { request }
+    let(:user) { create(:user, :with_system_admin_role) }
+
+    it "responds with success" do
+      expect(response.status).to eq(200)
+    end
+
+    it "responds with a correct Content-Type header" do
+      expect(response.headers["Content-Type"]).to eq("text/plain")
+    end
+
+    it "responds with a correct Content-Length header" do
+      expect(response.headers["Content-Length"]).to eq(file_size.to_s)
+    end
+
+    it "responds with a correct Content-Disposition header" do
+      expect(response.headers["Content-Disposition"]).to eq(%(attachment; filename="small.txt"))
+    end
+
+    it "responds with the same file content as original" do
+      expect(response.body).to eq(file)
+    end
+  end
+
   describe "GET: originals/:original_id/content?download=false" do
     let(:request) { faraday_client_with_token.get("originals/#{original_id}/content", { download: false}) }
     let(:response) { request }
@@ -104,8 +130,190 @@ describe "Originals" do
       expect(response.status).to eq(200)
     end
 
+    it "responds with a correct Content-Type header" do
+      expect(response.headers["Content-Type"]).to eq("text/plain")
+    end
+
+    it "responds with a correct Content-Length header" do
+      expect(response.headers["Content-Length"]).to eq(file_size.to_s)
+    end
+
+    it "responds with a correct Content-Disposition header" do
+      expect(response.headers["Content-Disposition"]).to be_nil
+    end
+
     it "responds with the same file content as original" do
       expect(response.body).to eq(file)
+    end
+  end
+
+  describe "Range header" do
+    let(:request) do
+      faraday_client_with_token.get("originals/#{original_id}/content") do |req|
+        req["Range"] = "bytes=#{range}"
+      end
+    end
+    let(:response) { request }
+    let(:user) { create(:user, :with_system_admin_role) }
+
+    context "for range: all bytes from part 1" do
+      let(:range) { "0-99" }
+
+      it "responds with '206 Partial Content' status code" do
+        expect(response.status).to eq(206)
+      end
+
+      it "responds with a correct Content-Range header" do
+        expect(response.headers["Content-Range"]).to eq("bytes #{range}/#{file_size}")
+      end
+
+      it "responds with a correct Content-Length header" do
+        expect(response.headers["Content-Length"]).to eq("100")
+      end
+
+      it "responds with the correct data" do
+        expect(response.body).to eq(part_1)
+      end
+    end
+
+    context "for range: all bytes from part 2" do
+      let(:range) { "100-131" }
+
+      it "responds with '206 Partial Content' status code" do
+        expect(response.status).to eq(206)
+      end
+
+      it "responds with a correct Content-Range header" do
+        expect(response.headers["Content-Range"]).to eq("bytes #{range}/#{file_size}")
+      end
+
+      it "responds with a correct Content-Length header" do
+        expect(response.headers["Content-Length"]).to eq("32")
+      end
+
+      it "responds with the correct data" do
+        expect(response.body).to eq(part_2)
+      end
+    end
+
+    context "for range: first 12 bytes" do
+      let(:range) { "0-11" }
+
+      it "responds with '206 Partial Content' status code" do
+        expect(response.status).to eq(206)
+      end
+
+      it "responds with a correct Content-Range header" do
+        expect(response.headers["Content-Range"]).to eq("bytes #{range}/#{file_size}")
+      end
+
+      it "responds with a correct Content-Length header" do
+        expect(response.headers["Content-Length"]).to eq("12")
+      end
+
+      it "responds with the correct data" do
+        expect(response.body).to eq("0123456789\n0")
+      end
+    end
+
+    context "for range: 4 bytes from the middle of the part 1" do
+      let(:range) { "54-57" }
+
+      it "responds with '206 Partial Content' status code" do
+        expect(response.status).to eq(206)
+      end
+
+      it "responds with a correct Content-Range header" do
+        expect(response.headers["Content-Range"]).to eq("bytes #{range}/#{file_size}")
+      end
+
+      it "responds with a correct Content-Length header" do
+        expect(response.headers["Content-Length"]).to eq("4")
+      end
+
+      it "responds with the correct data" do
+        expect(response.body).to eq("\n012")
+      end
+    end
+
+    context "for range: last 3 bytes from part 1 and 2 bytes from part 2" do
+      let(:range) { "97-101" }
+
+      it "responds with '206 Partial Content' status code" do
+        expect(response.status).to eq(206)
+      end
+
+      it "responds with a correct Content-Range header" do
+        expect(response.headers["Content-Range"]).to eq("bytes #{range}/#{file_size}")
+      end
+
+      it "responds with a correct Content-Length header" do
+        expect(response.headers["Content-Length"]).to eq("5")
+      end
+
+      it "responds with the correct data" do
+        expect(response.body).to eq("9\n012")
+      end
+    end
+
+    context "for range: last 2 bytes from part 1 and all bytes from part 2" do
+      let(:range) { "98-131" }
+
+      it "responds with '206 Partial Content' status code" do
+        expect(response.status).to eq(206)
+      end
+
+      it "responds with a correct Content-Range header" do
+        expect(response.headers["Content-Range"]).to eq("bytes #{range}/#{file_size}")
+      end
+
+      it "responds with a correct Content-Length header" do
+        expect(response.headers["Content-Length"]).to eq("34")
+      end
+
+      it "responds with the correct data" do
+        expect(response.body).to eq("\n0123456789\n0123456789\n0123456789\n")
+      end
+    end
+
+    context "for range: 5 bytes from the middle of the part 2" do
+      let(:range) { "109-113" }
+
+      it "responds with '206 Partial Content' status code" do
+        expect(response.status).to eq(206)
+      end
+
+      it "responds with a correct Content-Range header" do
+        expect(response.headers["Content-Range"]).to eq("bytes #{range}/#{file_size}")
+      end
+
+      it "responds with a correct Content-Length header" do
+        expect(response.headers["Content-Length"]).to eq("5")
+      end
+
+      it "responds with the correct data" do
+        expect(response.body).to eq("\n0123")
+      end
+    end
+
+    context "for range: last 3 bytes from the part 2" do
+      let(:range) { "129-131" }
+
+      it "responds with '206 Partial Content' status code" do
+        expect(response.status).to eq(206)
+      end
+
+      it "responds with a correct Content-Range header" do
+        expect(response.headers["Content-Range"]).to eq("bytes #{range}/#{file_size}")
+      end
+
+      it "responds with a correct Content-Length header" do
+        expect(response.headers["Content-Length"]).to eq("3")
+      end
+
+      it "responds with the correct data" do
+        expect(response.body).to eq("89\n")
+      end
     end
   end
 end
