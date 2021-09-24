@@ -12,8 +12,10 @@
 
 (def routes
   [["/" {:name :root}]
-   ["/admin" {:name :madek-admin}]
-   ["/my" {:name :my :authorizers #{:user}}]
+   ["/admin" {:name :madek-admin
+              :external true}]
+   ["/my" {:name :my
+           :external true}]
    ["/media-service/" {:authorizers #{:user}}
     ["" :home]
     ["analyzers/" {:authorizers #{:system-admin}}
@@ -58,6 +60,7 @@
 
 ;(reitit/match-by-name router :admin-stores)
 ;(reitit/match->path (reitit/match-by-name router :upload {:upload-id 5}))
+;(reitit/match-by-path router "/media-service/")
 
 (defn route [path]
   (-> path
@@ -83,9 +86,6 @@
        (str p "?" (utils-query-params/encode query-params))
        p))))
 
-
-(defn navigate! [& args]
-  (logging/warn 'TODO 'navigate!))
 
 ;(path :admin {} {:q 5})
 ;(path :upload-part {:upload-id "foo" :part 5})

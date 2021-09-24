@@ -150,7 +150,8 @@
    [:div.card-body
     [:div.form-row
      [filters/form-term-filter-component]
-     ]]])
+     [filters/per-page-select-component]
+     [filters/reset-component]]]])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

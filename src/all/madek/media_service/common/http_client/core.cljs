@@ -131,7 +131,7 @@
   (let [route (:route @routing-state*)
         chan (async/chan)]
     (go-loop [do-fetch true]
-             (logging/info 'route-cached-fetch 'go-loop {:route route})
+             ;(logging/info 'route-cached-fetch 'go-loop {:route route})
              (when do-fetch
                (let [req (request {:chan chan
                                    :url route})
