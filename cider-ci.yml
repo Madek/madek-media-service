@@ -1,0 +1,36 @@
+jobs:
+
+  build-media-service-uberjar:
+    name: Build media-service uberjar
+    run_when:
+      any branch has been updated:
+        type: branch
+        include_match: ^.*$
+    context:
+      task_defaults:
+        environment_variables:
+          MADEK_MEDIA_SERVICE_DIR: "{{CIDER_CI_WORKING_DIR}}"
+          RUBY: '{{RUBY_ENGINE}}-{{RUBY_VERSION}}'
+          RUBY_ENGINE: ruby
+          RUBY_VERSION: 2.7.2
+      tasks:
+        build-media-service-uberjar:
+          { include: cider-ci/uberjar_task-component.yml }
+
+  specs:
+    name: Run specs
+    depends_on: &SPEC_DEPENDENTS
+      uberjar passed:
+        type: job
+        job_key: build-media-service-uberjar
+        states: [passed]
+    run_when: *SPEC_DEPENDENTS
+    context: { include: cider-ci/specs_job-context.yml }
+
+#  good-to-merge:
+#    name: ⚑ Good To Merge
+#    description: |
+#      This job depends on all other tests and checks
+#      and it will pass if and only if all dependencies have passed.
+#      Status of this job is **used by github's "branch protection"**!
+#    include: cider-ci/good-to-merge_job-context.yml

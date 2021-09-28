@@ -1,21 +1,51 @@
 (ns madek.media-service.run
   (:require
+    [clj-pid.core :as pid]
+    [clojure.java.io :as io]
     [clojure.pprint :refer [pprint]]
     [clojure.tools.cli :as cli]
-    [taoensso.timbre :as timbre :refer [debug info]]
     [clojure.tools.logging :as logging]
+    [environ.core :refer [env]]
     [madek.media-service.db :as db]
-    [madek.media-service.resources.settings.main :as settings]
     [madek.media-service.http.server :as http-server]
     [madek.media-service.logging :as service-logging]
     [madek.media-service.repl :as repl]
-    [madek.media-service.routing :as routing]
+    [madek.media-service.resources.settings.main :as settings]
     [madek.media-service.resources.uploads.database-store.complete :as db-store-complete]
-    [madek.media-service.state :as state]))
+    [madek.media-service.routing :as routing]
+    [madek.media-service.state :as state]
+    [signal.handler]
+    [taoensso.timbre :as timbre :refer [debug info]]))
+
+;;; exit & shutdown ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn shutdown []
+  (http-server/stop)
+  (db/close)
+  (repl/stop))
+
+(def pid-file-options
+  [[nil "--pid-file PID_FILE"
+    :default (some-> :pid-file env)
+    ]])
+
+(defn init-shutdown [options]
+  (when-let [pid-file (:pid-file options)]
+    (logging/info "PID_FILE" pid-file)
+    (io/make-parents pid-file) ; ensure dirs exist before creating file!
+    (pid/save pid-file)
+    (pid/delete-on-shutdown! pid-file))
+  (signal.handler/with-handler :term
+    (logging/info "Received SIGTERM, exiting ...")
+    (System/exit 0)))
+
+
+;;; cli ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def cli-options
   (concat
     [["-h" "--help"]]
+    pid-file-options
     db/cli-options
     http-server/cli-options
     repl/cli-options
@@ -44,15 +74,12 @@
 
 (defonce options* (atom nil))
 
-(defn shutdown []
-  (http-server/stop)
-  (db/close)
-  (repl/stop))
-
 (defn init-http []
   (-> (routing/init @options*)
       (http-server/init @options*)))
 
+
+;;; main ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn -main [& args]
   (let [{:keys [options arguments errors summary]}
@@ -66,6 +93,7 @@
                 (.addShutdownHook (Runtime/getRuntime) (Thread. #(shutdown)))
                 (state/init)
                 (service-logging/init options)
+                (init-shutdown options)
                 (repl/init options)
                 (db/init options)
                 (db-store-complete/init)

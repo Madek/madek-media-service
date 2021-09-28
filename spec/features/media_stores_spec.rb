@@ -1,6 +1,9 @@
 require 'pry'
 
 describe "Media Stores", type: :feature do
+
+  # TODO user creation seems to be missing
+
   let(:session_cookie_value) do
     MadekOpenSession.build_session_value(User.find_by(login: 'adam'))
   end

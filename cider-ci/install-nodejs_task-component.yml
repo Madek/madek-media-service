@@ -1,0 +1,26 @@
+traits:
+  'nvm-nodejs-version-manager': true
+  Bash: true
+
+scripts:
+  install-nodejs:
+    exclusive_executor_resource: nodejs-install_{{$NVM_NODEJS_VERSION}}
+    timeout: 20 Minutes
+    body: |
+      #!/usr/bin/env bash
+      set -eu
+
+      source ~/.nvm/nvm.sh
+
+      # cleanup leftovers from aborted installs (or npm upgrade might fail)
+      rm -rf  "$NVM_DIR"/versions/node/*/lib/node_modules/.npm-*
+
+      nvm install "$NVM_NODEJS_VERSION"
+      nvm use "$NVM_NODEJS_VERSION"
+      npm i -g npm@7
+
+      which node
+      node --version
+
+      which npm
+      npm --version

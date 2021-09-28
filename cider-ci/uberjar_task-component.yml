@@ -1,0 +1,33 @@
+name: "Build uberjar"
+
+include:
+  - path: cider-ci/install-ruby_task-component.yml
+  - path: cider-ci/install-nodejs_task-component.yml
+
+git_options:
+  submodules:
+    include_match: ^.*$
+
+traits:
+  JDK 8: true
+  Leiningen 2: true
+
+environment_variables:
+  NVM_NODEJS_VERSION: "14"
+
+# note build-ui is strictly not necessary since build invokes it itself
+# however caching is much more efficient this way
+#
+scripts:
+  build-media-service-uberjar:
+    start_when:
+      nodejs-is-installed:
+        script_key: install-nodejs
+      ruby-is-installed:
+        script_key: install-ruby
+
+    timeout: 15 minutes
+    exclusive_executor_resource: build_media-service_uberjar
+    body: |
+      . ~/.nvm/nvm.sh && nvm use "$NVM_NODEJS_VERSION"
+      ${MADEK_MEDIA_SERVICE_DIR}/bin/uberjar

@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 set -euxo
+
+PROJECT_NAME="madek-media-service"
+PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
+
+cd $PROJECT_DIR
+
+# add our clojure version to the path
+source $PROJECT_DIR/clojure/bin/activate
+
 rm -f madek-media-service.jar
 ./bin/clean
 echo $(date -u +"%Y-%m-%dT%H:%M:%SZ") > resources/build-timestamp.txt

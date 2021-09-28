@@ -1,0 +1,53 @@
+generate_tasks:
+  # all of them
+  include_match: spec\/.*_spec.rb
+  # only request specs
+  include_match: spec\/requests\/.*_spec.rb
+  # focus on one
+  # include_match: spec.*dashboard_spec.rb
+
+task_defaults:
+  include:
+    - cider-ci/database_task-component.yml
+    - cider-ci/ruby-bundle_task-component.yml
+    - cider-ci/service_task-component.yml
+    - cider-ci/uberjar_task-component.yml
+  traits:
+    JDK 8: true
+    Leiningen 2: true
+    Firefox ESR 78: true
+  ports:
+    MADEK_MEDIA_SERVICE_HTTP_PORT:
+      min: 3000
+      max: 3999
+  environment_variables:
+    DATABASE_NAME: madek_media-service_{{CIDER_CI_TRIAL_ID}}
+    DB_NAME: "{{DATABASE_NAME}}"
+    MADEK_MEDIA_SERVICE_DIR: "{{CIDER_CI_WORKING_DIR}}"
+    DATABASE_URL: "jdbc:postgresql://localhost/{{DATABASE_NAME}}?max-pool-size=5"
+    MADEK_MEDIA_SERVICE_HTTP_BASE_URL: http://localhost:{{MADEK_MEDIA_SERVICE_HTTP_PORT}}
+    RAILS_ENV: test
+    RUBY: '{{RUBY_ENGINE}}-{{RUBY_VERSION}}'
+    RUBY_ENGINE: ruby
+    RUBY_VERSION: 2.7.2
+  git_options:
+    submodules:
+      include_match: ^.*$
+  templates:
+    # rspec needs the database.yml because it is using rails
+    database for the datalayer:
+      src: cider-ci/templates/database.yml
+      dest: datalayer/config/database.yml
+  trial_attachments:
+    screenshots:
+      include_match: '^tmp\/screenshots\/.+\.png$'
+      content_type: image/png
+  scripts:
+    test:
+      body: |
+        #!/usr/bin/env bash
+        set -eux
+        export PATH=~/.rubies/$RUBY/bin:$PATH
+        env | sort
+        mkdir -p log
+        xvfb-run -a -e log/xvfb.log bundle exec rspec $CIDER_CI_TASK_FILE

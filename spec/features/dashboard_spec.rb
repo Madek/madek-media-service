@@ -1,9 +1,13 @@
+require 'spec_helper'
 require 'pry'
 
 describe "displaying dashboard", type: :feature do
   before do
     visit "/"
-    cookie_value = MadekOpenSession.build_session_value(User.find_by(login: 'adam'))
+    # TODO there is something missing here
+    user = User.find_by(login: 'adam')
+    expect(user).to be
+    cookie_value = MadekOpenSession.build_session_value(user)
     page.driver.browser.manage.add_cookie(name: "madek-session", value: cookie_value)
   end
 

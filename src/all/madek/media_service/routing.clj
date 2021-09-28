@@ -16,6 +16,7 @@
     [madek.media-service.resources.originals.original.main :as original]
     [madek.media-service.resources.settings.main :as settings]
     [madek.media-service.resources.spa-back :as spa]
+    [madek.media-service.resources.status.main :as status]
     [madek.media-service.resources.stores.main :as stores]
     [madek.media-service.resources.stores.store.groups.group.main :as store-group]
     [madek.media-service.resources.stores.store.groups.main :as store-groups]
@@ -52,6 +53,8 @@
 (def resolve-table
   {:original #'original/handler
    :original-content #'original/handler
+   :settings #'settings/handler
+   :status #'status/handler
    :store-group-priority #'store-group/handler
    :store-groups #'store-groups/handler
    :store-user-direct-priority #'store-user/handler
@@ -62,7 +65,6 @@
    :upload-part #'uploads/handler
    :upload-start #'uploads/handler
    :uploads #'uploads/handler
-   :settings #'settings/handler
    :ws #'ws/handler })
 
 (defn route-resolve [handler request]

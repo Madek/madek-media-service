@@ -7,6 +7,7 @@
   cheshire {:mvn/version "5.10.1"}
   cli-matic {:mvn/version "0.4.3"}
   clj-commons/clj-yaml {:mvn/version "0.7.107"}
+  clj-pid/clj-pid {:mvn/version "0.1.2"}
   cljc.java-time/cljc.java-time {:mvn/version "0.1.16"}
   cljs-http/cljs-http {:mvn/version "0.1.46"}
   clojure-humanize/clojure-humanize {:mvn/version "0.2.2"}
@@ -42,6 +43,7 @@
   ring-middleware-accept {:mvn/version "2.0.3"}
   ring/ring-core {:mvn/version "1.9.4"}
   ring/ring-json {:mvn/version "0.5.1"}
+  spootnik/signal {:mvn/version "0.2.4"}
   timothypratley/patchin {:mvn/version "0.3.5"}
   tick {:mvn/version "0.4.32"}
   }

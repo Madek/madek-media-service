@@ -16,6 +16,9 @@
    ["/my" {:name :my :authorizers #{:user}}]
    ["/media-service/" {:authorizers #{:user}}
     ["" :home]
+    ["status" {:name :status
+                :authorizers ^:replace #{}
+                :bypass-spa true}]
     ["originals/"
      [":original-id"
       ["/content" {:name :original-content

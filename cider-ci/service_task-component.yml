@@ -1,0 +1,53 @@
+environment_variables:
+  PID_FILE: "{{MADEK_MEDIA_SERVICE_DIR}}/tmp/process.pid"
+
+scripts:
+
+  run-media-service:
+    start_when:
+      uberjar has been built:
+        script_key: build-media-service-uberjar
+      database has been created:
+        script_key: create-database
+    body: |
+      set -euxo
+      cd $MADEK_MEDIA_SERVICE_DIR
+      mkdir -p $MADEK_MEDIA_SERVICE_DIR/tmp
+      java -jar madek-media-service.jar run --http-server-port $MADEK_MEDIA_SERVICE_HTTP_PORT
+
+  media-service-is-running:
+    body: |
+      set -euxo
+      until curl --silent --fail -I \
+        -H 'Accept: application/json' \
+        ${MADEK_MEDIA_SERVICE_HTTP_BASE_URL}/media-service/status;
+        do sleep 1;
+      done
+    start_when:
+      run server is executing:
+        script_key: run-media-service
+        states: [executing]
+
+  test:
+    start_when:
+      admin service is running:
+        script_key: media-service-is-running
+
+  shutdown-media-service:
+    body: |
+      set -euxo
+      cd $MADEK_MEDIA_SERVICE_DIR
+      export PID=$(cat tmp/process.pid)
+      kill $PID
+      tail --pid=$PID -f /dev/null
+    start_when:
+      test is terminal:
+        script_key: test
+        states: [aborted, defective, passed, failed, skipped]
+
+  delete-database:
+    start_when:
+       shutdown-media-service is in termial state:
+        script_key: shutdown-media-service
+        states: [aborted, defective, passed, failed, skipped]
+

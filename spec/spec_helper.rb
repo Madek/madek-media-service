@@ -1,12 +1,18 @@
-require 'capybara/rspec'
 ENV["RAILS_ENV"] = "test"
+
+def base_url
+  @base_url ||= ENV['MADEK_MEDIA_SERVICE_HTTP_BASE_URL'].presence || 'http://localhost:3180'
+end
+
+def port
+  @port ||= Addressable::URI.parse(base_url).port
+end
+
 require './datalayer/config/environment'
 require 'config/http_client'
 require 'config/helpers'
+require 'config/browser'
 
-def base_url
-  "http://localhost:3180"
-end
 
 RSpec.configure do |config|
   raise "Run tests in test environment: `RAILS_ENV=test rspec spec/`" unless Rails.env.test?
@@ -38,6 +44,4 @@ RSpec.configure do |config|
     end
   end
 
-  Capybara.default_driver = :selenium
-  Capybara.app_host = base_url
 end
