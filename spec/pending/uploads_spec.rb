@@ -8,14 +8,14 @@ describe "Uploads", type: :request do
   let(:md5) { Digest::MD5.hexdigest(file) }
   let(:part_1_md5) { Digest::MD5.hexdigest(part_1) }
   let(:part_2_md5) { Digest::MD5.hexdigest(part_2) }
-  let(:start_request) { faraday_client_with_token.post("settings/uploads/#{upload_id}/start") }
+  let(:start_request) { faraday_client_with_token.post("uploads/#{upload_id}/start") }
   let(:complete_request) do
-    faraday_client_with_token.post("settings/uploads/#{upload_id}/complete")
+    faraday_client_with_token.post("uploads/#{upload_id}/complete")
   end
   let(:upload_id) do
     faraday_client_with_token(json_response: true)
       .post(
-        "settings/uploads/",
+        "uploads/",
         content_type: "text/plain",
         filename: "small.txt",
         md5: md5,
@@ -28,8 +28,8 @@ describe "Uploads", type: :request do
   let(:api_token) { create(:api_token, user: user, scope_write: true) }
   let(:user_token) { api_token.token_hash }
 
-  describe "GET: settings/uploads/" do
-    let(:response) { faraday_client_with_token.get("settings/uploads/") }
+  describe "GET: uploads/" do
+    let(:response) { faraday_client_with_token.get("uploads/") }
 
     context "with public access" do
       let(:user) { nil }
@@ -58,10 +58,10 @@ describe "Uploads", type: :request do
     end
   end
 
-  describe "POST: settings/uploads/" do
+  describe "POST: uploads/" do
     let!(:store) { create(:media_store, :database, :with_users, users: [user].compact) }
     let(:request) do
-      faraday_client_with_token.post("settings/uploads/",
+      faraday_client_with_token.post("uploads/",
                                 content_type: "text/plain",
                                 filename: "small.txt",
                                 md5: md5,
@@ -115,7 +115,7 @@ describe "Uploads", type: :request do
     end
   end
 
-  describe "POST: settings/uploads/:upload_id/start" do
+  describe "POST: uploads/:upload_id/start" do
     let(:response) { start_request }
     let(:store) { create(:media_store, :database, :with_users, users: [user].compact) }
 
@@ -168,7 +168,7 @@ describe "Uploads", type: :request do
     end
   end
 
-  describe "POST: settings/uploads/:upload_id/complete" do
+  describe "POST: uploads/:upload_id/complete" do
     let(:response) { complete_request }
     let(:store) { create(:media_store, :database, :with_users, users: [user].compact) }
 
@@ -199,7 +199,7 @@ describe "Uploads", type: :request do
 
       context "when upload has 'started' state" do
         before do
-          faraday_client_with_token.post("settings/uploads/#{upload_id}/start")
+          faraday_client_with_token.post("uploads/#{upload_id}/start")
         end
 
         it "responds with success" do
@@ -245,7 +245,7 @@ describe "Uploads", type: :request do
     let(:user) { create(:user, :with_system_admin_role) }
     let(:chunk_size) { 100 }
     def upload_get_request
-      faraday_client_with_token(json_response: true).get("settings/uploads/#{upload_id}")
+      faraday_client_with_token(json_response: true).get("uploads/#{upload_id}")
     end
 
     before do
@@ -296,10 +296,10 @@ describe "Uploads", type: :request do
       }.stringify_keys)
     end
 
-    describe "GET: settings/uploads/:upload_id" do
+    describe "GET: uploads/:upload_id" do
       context "when all parts of file have been sent" do
         before do
-          part_1_request          
+          part_1_request
           part_2_request
           complete_request
         end

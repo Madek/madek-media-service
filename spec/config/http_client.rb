@@ -29,7 +29,7 @@ module Config
 
     def faraday_client_for_upload
       Faraday.new(
-        url: "#{base_url}/media-service/settings/uploads/#{upload_id}/",
+        url: "#{base_url}/media-service/uploads/#{upload_id}/",
         headers: {
           accept: "application/json"
         }

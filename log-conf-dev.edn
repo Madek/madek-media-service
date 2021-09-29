@@ -1,4 +1,9 @@
-{:min-level :info
- :ns-whitelist ["madek.media-service.*"]
- :ns-blacklist []
+; logging file for development
+
+{
+ :min-level [[#{"madek.media-service.CHANGE-ME"} :debug]
+             [#{"madek.media-service.*"} :info]
+             [#{"*"} :warn]]
+ ; min-level oder matters: it is greedy!
+
  }

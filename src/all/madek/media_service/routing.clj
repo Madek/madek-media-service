@@ -28,8 +28,8 @@
     [madek.media-service.utils.cli-options :refer [long-opt-for-key]]
     [madek.media-service.utils.core :refer [keyword presence str]]
     [madek.media-service.utils.http.anti-csrf-back :as anti-csrf]
-    [logbug.debug]
-    [logbug.ring]
+    [logbug.debug :as debug :refer [I>]]
+    [logbug.ring :refer [wrap-handler-with-logging]]
     ))
 
 
@@ -136,7 +136,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn build-routes []
-  (-> not-found-handler
+  (I> wrap-handler-with-logging
+      not-found-handler
       wrap-route-dispatch
       ;(logbug.ring/wrap-handler-with-logging :info)
       wrap-authorize!

@@ -7,14 +7,14 @@ describe "Originals" do
   let(:part_1_md5) { Digest::MD5.hexdigest(part_1) }
   let(:part_2_md5) { Digest::MD5.hexdigest(part_2) }
   let(:store) { create(:media_store, :database, :with_users, users: [user]) }
-  let(:start_request) { faraday_client_with_token.post("settings/uploads/#{upload_id}/start") }
+  let(:start_request) { faraday_client_with_token.post("uploads/#{upload_id}/start") }
   let(:complete_request) do
-    faraday_client_with_token.post("settings/uploads/#{upload_id}/complete")
+    faraday_client_with_token.post("uploads/#{upload_id}/complete")
   end
   let(:upload_request) do
     faraday_client_with_token(json_response: true)
       .post(
-        "settings/uploads/",
+        "uploads/",
         content_type: "text/plain",
         filename: "small.txt",
         md5: md5,
@@ -42,7 +42,7 @@ describe "Originals" do
     end
   end
   def upload_get_request
-    faraday_client_with_token(json_response: true).get("settings/uploads/#{upload_id}")
+    faraday_client_with_token(json_response: true).get("uploads/#{upload_id}")
   end
   let(:api_token) { create(:api_token, user: user, scope_write: true) }
   let(:user_token) { api_token.token_hash }

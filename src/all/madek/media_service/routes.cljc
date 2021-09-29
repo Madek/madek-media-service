@@ -17,39 +17,37 @@
    ["/media-service/" {:authorizers #{:user}}
     ["" :home]
     ["status" {:name :status
-                :authorizers ^:replace #{}
-                :bypass-spa true}]
+               :authorizers ^:replace #{}
+               :bypass-spa true}]
     ["originals/"
      [":original-id"
       ["/content" {:name :original-content
                    :bypass-spa true}]
       ["" :original]]]
     ["settings/" {:authorizers #{:system-admin}}
-     ["" {:name :settings}]
-     ["stores/" {:authorizers #{:system-admin}}
-      ["" {:name :stores}]
-      [":store-id"
-       ["" {:name :store}]
-       ["/groups/"
-        ["" {:name :store-groups}]
-        [":group-id" {:name :store-group}]
-        [":group-id/priority" {:name :store-group-priority}]]
-       ["/users/"
-        ["" {:name :store-users}]
-        [":user-id" {:name :store-user}]
-        [":user-id/direct-priority" {:name :store-user-direct-priority}]]]]
-     ["uploads/"
-      ["" {:name :uploads}]
-      [":upload-id"
-       ["" {:name :upload}]
-       ["/start" {:name :upload-start}]
-       ["/complete" {:name :upload-complete}]
-       ["/parts/"
-        ["" {:name :upload-parts}]
-        [":part" :upload-part]]]]
-     ["ws/" {:name :ws
-             :get :foo
-             :post :bar}]]]])
+     ["" {:name :settings}] ]
+    ["stores/" {:authorizers #{:system-admin}}
+     ["" {:name :stores}]
+     [":store-id"
+      ["" {:name :store}]
+      ["/groups/"
+       ["" {:name :store-groups}]
+       [":group-id" {:name :store-group}]
+       [":group-id/priority" {:name :store-group-priority}]]
+      ["/users/"
+       ["" {:name :store-users}]
+       [":user-id" {:name :store-user}]
+       [":user-id/direct-priority" {:name :store-user-direct-priority}]]]]
+    ["uploads/"
+     ["" {:name :uploads}]
+     [":upload-id"
+      ["" {:name :upload}]
+      ["/start" {:name :upload-start}]
+      ["/complete" {:name :upload-complete}]
+      ["/parts/"
+       ["" {:name :upload-parts}]
+       [":part" :upload-part]]]]
+    ["ws/" {:name :ws}]]])
 
 (def router (reitit/router routes))
 

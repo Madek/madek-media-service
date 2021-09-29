@@ -1,8 +1,8 @@
 require 'requests/shared/authorization_error'
 
 describe "Resources" do
-  describe "Stores: /media-service/settings/stores/", type: :request do
-    let(:request) { faraday_client_with_token.get("settings/stores/") }
+  describe "Stores: /media-service/stores/", type: :request do
+    let(:request) { faraday_client_with_token.get("stores/") }
     let(:response) { request }
 
     context "with public access" do

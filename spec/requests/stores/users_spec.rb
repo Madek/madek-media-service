@@ -1,10 +1,10 @@
 require 'requests/shared/authorization_error'
 
 describe "Resources" do
-  describe "Users: /media-service/settings/stores/:store_id/users/", type: :request do
+  describe "Users: /media-service/stores/:store_id/users/", type: :request do
     let(:api_token) { create(:api_token, user: user, scope_write: true) }
     let(:user_token) { api_token.token_hash }
-    let(:request) { faraday_client_with_token.get("settings/stores/#{store_id}/users/") }
+    let(:request) { faraday_client_with_token.get("stores/#{store_id}/users/") }
     let(:response) { request }
     let(:store) { create(:media_store) }
     let(:store_id) { store.id }
@@ -110,7 +110,7 @@ describe "Resources" do
 
         describe "filtering" do
           let(:response) do
-            faraday_client_with_token.get("settings/stores/#{store_id}/users/?term=horn")
+            faraday_client_with_token.get("stores/#{store_id}/users/?term=horn")
           end
 
           it "responses with success" do
@@ -141,7 +141,7 @@ describe "Resources" do
       describe "updating user's priority" do
         let(:perform_request) do
           faraday_client_with_token
-            .put("settings/stores/#{store_id}/users/#{user_2.id}/direct-priority",
+            .put("stores/#{store_id}/users/#{user_2.id}/direct-priority",
                  priority: 4)
         end
 
@@ -155,7 +155,7 @@ describe "Resources" do
       describe "deleting user's priority" do
         let(:perform_request) do
           faraday_client_with_token
-            .delete("settings/stores/#{store_id}/users/#{user_2.id}/direct-priority")
+            .delete("stores/#{store_id}/users/#{user_2.id}/direct-priority")
         end
 
         it "responds with 204" do
