@@ -81,7 +81,7 @@
    (when-not (-> @state* :user presence)
      [:div.mt-3
       [:> bs/Alert {:variant :warning}
-       [:h3 [:strong "You are not singed in!"]]
+       [:h3 [:strong "You are not signed in!"]]
        [:p "You can sign in on the" [:> bs/Alert.Link {:href (path :root)} " home page" ] "."]
        ]])
    (if-let [page (get-in @state* [:routing :page])]

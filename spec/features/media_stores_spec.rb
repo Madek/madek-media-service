@@ -1,68 +1,75 @@
-require 'pry'
+require "features/shared/authentication_error"
+require "features/shared/authorization_error"
 
 describe "Media Stores", type: :feature do
+  let!(:database_store) { create(:media_store, :database) }
+  let!(:filesystem_store) { create(:media_store, :filesystem) }
+  let(:path) { "/media-service/stores/" }
 
-  # TODO user creation seems to be missing
+  context "for public" do
+    before do
+      visit path
+    end
 
-  let(:session_cookie_value) do
-    MadekOpenSession.build_session_value(User.find_by(login: 'adam'))
+    it "doesn't display user's dropdown in navbar" do
+      expect(page).not_to have_css('.navbar a.dropdown-toggle')
+    end
+
+    it_displays "authentication error"
+    it_displays "authorization error"
   end
 
-  before do
-    visit "/"
-    expect(page).to have_content "You are not singed in!"
+  context "for an ordinary user" do
+    let(:user) { create(:user) }
 
-    # page.driver.browser.manage.add_cookie(name: "madek-session", value: cookie_value)
-    Capybara.current_session.driver.browser.manage.add_cookie(
-      name: "madek-session",
-      value: session_cookie_value
-    )
+    before { sign_in }
+
+    it_displays "authorization error"
   end
 
-  it "displays it ;)" do
-    visit '/media-service/'
+  context "for an user with admin role" do
+    let(:user) { create(:user, :with_admin_role) }
 
-    find('.navbar .dropdown-toggle').click
-    click_link 'Media-Stores'
+    before { sign_in }
 
-    expect(page).to have_css('h2', text: 'Media-Stores')
+    it_displays "authorization error"
+  end
 
-    within '#stores-page' do
-      expect(page).to have_css('table')
-      within 'table' do
-        expect(page).to have_css('tr', text: 'legacy-file-store filesystem')
-        expect(page).to have_css('tr', text: 'database database')
+  context "for an user with system admin role" do
+    let(:user) { create(:user, :with_system_admin_role) }
+
+    before do
+      sign_in
+
+      visit path
+    end
+
+    it "is navigable" do
+      within first(".navbar") do
+        find(".dropdown-toggle").click
+        click_link "Media-Stores"
+      end
+
+      expect(current_path).to eq("/media-service/stores/")
+      expect(page).to have_css("h2", text: "Media-Stores")
+
+      within '#stores-page' do
+        expect(page).to have_css('table')
+        within 'table' do
+          expect(page).to have_css('tr', text: 'legacy-file-store filesystem')
+          expect(page).to have_css('tr', text: 'database database')
+        end
       end
     end
-  end
 
-  it "navigates to store users page" do
-    visit "/media-service/stores/"
-
-    click_link href: '/media-service/stores/legacy-file-store/users/'
-
-    expect(page).to have_css('h2', text: 'Media-Store legacy-file-store Users')
-
-    page.assert_selector('table.users tbody tr', minimum: 5)
-
-    fill_in 'term', with: 'ada'
-
-    expect(page).to have_css('table.users tbody tr', count: 1)
-
-    within '.direct-priority-component' do
-      expect(page).to have_content '-'
-
-      click_button 'Edit'
+    specify "page has links to users" do
+      expect(page).to have_link("0", href: "/media-service/stores/legacy-file-store/users/")      
+      expect(page).to have_link("0", href: "/media-service/stores/database/users/")      
     end
 
-    expect(page).to have_css('.modal')
-    fill_in 'direct_priority', with: 5
-
-    within('.modal') { click_button 'Save' }
-
-    expect(page).to have_css('table.users tbody tr', count: 1)
-    within '.combined-priority-component' do
-      expect(page).to have_content '5'
+    specify "page has links to groups" do
+      expect(page).to have_link("0", href: "/media-service/stores/legacy-file-store/groups/")      
+      expect(page).to have_link("0", href: "/media-service/stores/database/groups/")      
     end
   end
 end

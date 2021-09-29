@@ -9,6 +9,10 @@ def set_capybara_values
   Capybara.server_port = port
 end
 
+def maximize_window_if_possible
+  Capybara.page.driver.browser.manage.window.maximize if Capybara.current_driver == :firefox
+end
+
 ACCEPTED_FIREFOX_ENV_PATHS = ['FIREFOX_ESR_78_PATH']
 
 def accepted_firefox_path
@@ -33,7 +37,12 @@ Capybara.register_driver :firefox do |app|
   # profile["intl.accept_languages"] = "en"
   #
   profile_config = {
-    'browser.helperApps.neverAsk.saveToDisk' => 'image/jpeg,application/pdf,application/json',
+    'browser.helperApps.neverAsk.saveToDisk' => %w(
+      image/jpeg
+      application/pdf
+      application/json
+      text/plain
+    ).join(','),
     'browser.download.folderList' => 2, # custom location
     'browser.download.dir' => BROWSER_DOWNLOAD_DIR.to_s
   }
@@ -71,6 +80,7 @@ RSpec.configure do |config|
 
   config.before :all do
     set_capybara_values
+    maximize_window_if_possible
   end
 
   config.before :each do |example|

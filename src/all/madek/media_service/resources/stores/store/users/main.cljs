@@ -127,7 +127,7 @@
     ]])
 
 (defn user-row-component [user]
-  [:tr
+  [:tr {:data-id (:key user)}
    [:td.text-monospace (:index user)]
    [:td.text-center [user-name-ident-component user]]
    [:td.text-right [combined-priority-component user]]

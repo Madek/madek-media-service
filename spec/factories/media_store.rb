@@ -6,8 +6,13 @@ FactoryGirl.define do
     type { MediaStore::TYPES.without("database").sample }
 
     trait :database do
-      id { "database" }
-      type { "database" }
+      id "database"
+      type "database"
+    end
+
+    trait :filesystem do
+      id "legacy-file-store"
+      type "filesystem"
     end
 
     trait :with_users do
