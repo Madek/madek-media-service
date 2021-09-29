@@ -8,10 +8,11 @@ def port
   @port ||= Addressable::URI.parse(base_url).port
 end
 
-require './datalayer/config/environment'
-require 'config/http_client'
-require 'config/helpers'
+require "./datalayer/config/environment"
+require "config/http_client"
+require "config/helpers"
 require 'config/browser'
+require "config/session_helper"
 
 
 RSpec.configure do |config|
@@ -29,6 +30,7 @@ RSpec.configure do |config|
 
   config.include Config::HTTPClient
   config.include Config::Helpers
+  config.include Config::SessionHelper, type: :feature
   config.include FactoryGirl::Syntax::Methods
 
   config.before(:suite) do

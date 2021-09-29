@@ -1,22 +1,8 @@
-require 'pry'
-
 describe "Media Stores", type: :feature do
-
-  # TODO user creation seems to be missing
-
-  let(:session_cookie_value) do
-    MadekOpenSession.build_session_value(User.find_by(login: 'adam'))
-  end
+  let(:user) { create(:user, :with_system_admin_role) }
 
   before do
-    visit "/"
-    expect(page).to have_content "You are not singed in!"
-
-    # page.driver.browser.manage.add_cookie(name: "madek-session", value: cookie_value)
-    Capybara.current_session.driver.browser.manage.add_cookie(
-      name: "madek-session",
-      value: session_cookie_value
-    )
+    sign_in
   end
 
   it "displays it ;)" do
@@ -37,9 +23,9 @@ describe "Media Stores", type: :feature do
   end
 
   it "navigates to store users page" do
-    visit "/media-service/stores/"
+    visit "/media-service/settings/stores/"
 
-    click_link href: '/media-service/stores/legacy-file-store/users/'
+    click_link href: '/media-service/settings/stores/legacy-file-store/users/'
 
     expect(page).to have_css('h2', text: 'Media-Store legacy-file-store Users')
 

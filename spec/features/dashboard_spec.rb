@@ -1,19 +1,19 @@
 require 'spec_helper'
-require 'pry'
 
 describe "displaying dashboard", type: :feature do
+  let(:user) { create(:user, :with_system_admin_role) }
+  let(:username) do
+    person = user.person
+    "#{person.first_name} #{person.last_name}"
+  end
+
   before do
-    visit "/"
-    # TODO there is something missing here
-    user = User.find_by(login: 'adam')
-    expect(user).to be
-    cookie_value = MadekOpenSession.build_session_value(user)
-    page.driver.browser.manage.add_cookie(name: "madek-session", value: cookie_value)
+    sign_in
   end
 
   it "displays it ;)" do
     visit '/media-service/'
 
-    expect(page).to have_css('.navbar', text: 'Adam Admin')
+    expect(page).to have_selector('a.dropdown-toggle', text: username)
   end
 end
