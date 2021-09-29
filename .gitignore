@@ -10,6 +10,7 @@ madek-media-service_aot.jar
 node_modules/
 pom.xml
 resources/build-timestamp.txt
+resources/commit-id.txt
 resources/media-service/public/js/
 tmp/
 tmux-client*.log

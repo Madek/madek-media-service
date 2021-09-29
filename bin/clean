@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euxo
-rm -rf madek-media-service
 rm -rf resources/media-service/public/js/
 rm -f resources/build-timestamp.txt
+rm -f resources/build-timestamp.txt
+rm -f resources/deps.svg
