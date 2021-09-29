@@ -2,7 +2,7 @@ generate_tasks:
   # all of them
   include_match: spec\/.*_spec.rb
   # only request specs
-  include_match: spec\/requests\/.*_spec.rb
+  # include_match: spec\/requests\/.*_spec.rb
   # focus on one
   # include_match: spec.*dashboard_spec.rb
 
