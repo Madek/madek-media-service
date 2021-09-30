@@ -217,7 +217,7 @@
 <polygon fill="#d3d3d3" stroke="#000000" points="175.5,-1820.5 175.5,-1866.5 316.5,-1866.5 316.5,-1820.5 175.5,-1820.5"/>
 <text text-anchor="middle" x="246" y="-1851.3" font-family="Times,serif" font-size="14.00" fill="#000000">org.clojure/core.async</text>
 <polyline fill="none" stroke="#000000" points="175.5,-1843.5 316.5,-1843.5 "/>
-<text text-anchor="middle" x="246" y="-1828.3" font-family="Times,serif" font-size="14.00" fill="#000000">1.3.618</text>
+<text text-anchor="middle" x="246" y="-1828.3" font-family="Times,serif" font-size="14.00" fill="#000000">1.3.622</text>
 </g>
 <!-- root&#45;&gt;org.clojure/core.async -->
 <g id="edge137" class="edge">
@@ -385,7 +385,7 @@
 <polygon fill="#d3d3d3" stroke="#000000" points="143.5,-1040.5 143.5,-1086.5 348.5,-1086.5 348.5,-1040.5 143.5,-1040.5"/>
 <text text-anchor="middle" x="246" y="-1071.3" font-family="Times,serif" font-size="14.00" fill="#000000">com.github.seancorfield/honeysql</text>
 <polyline fill="none" stroke="#000000" points="143.5,-1063.5 348.5,-1063.5 "/>
-<text text-anchor="middle" x="246" y="-1048.3" font-family="Times,serif" font-size="14.00" fill="#000000">2.0.0&#45;rc2</text>
+<text text-anchor="middle" x="246" y="-1048.3" font-family="Times,serif" font-size="14.00" fill="#000000">2.0.813</text>
 </g>
 <!-- root&#45;&gt;com.github.seancorfield/honeysql -->
 <g id="edge50" class="edge">
@@ -1051,7 +1051,7 @@
 <polygon fill="#d3d3d3" stroke="#000000" points="879.5,-1885.5 879.5,-1931.5 1039.5,-1931.5 1039.5,-1885.5 879.5,-1885.5"/>
 <text text-anchor="middle" x="959.5" y="-1916.3" font-family="Times,serif" font-size="14.00" fill="#000000">org.clojure/tools.analyzer</text>
 <polyline fill="none" stroke="#000000" points="879.5,-1908.5 1039.5,-1908.5 "/>
-<text text-anchor="middle" x="959.5" y="-1893.3" font-family="Times,serif" font-size="14.00" fill="#000000">1.0.0</text>
+<text text-anchor="middle" x="959.5" y="-1893.3" font-family="Times,serif" font-size="14.00" fill="#000000">1.1.0</text>
 </g>
 <!-- org.clojure/tools.analyzer.jvm -->
 <g id="node16" class="node">
@@ -1059,7 +1059,7 @@
 <polygon fill="#d3d3d3" stroke="#000000" points="510.5,-1820.5 510.5,-1866.5 695.5,-1866.5 695.5,-1820.5 510.5,-1820.5"/>
 <text text-anchor="middle" x="603" y="-1851.3" font-family="Times,serif" font-size="14.00" fill="#000000">org.clojure/tools.analyzer.jvm</text>
 <polyline fill="none" stroke="#000000" points="510.5,-1843.5 695.5,-1843.5 "/>
-<text text-anchor="middle" x="603" y="-1828.3" font-family="Times,serif" font-size="14.00" fill="#000000">1.1.0</text>
+<text text-anchor="middle" x="603" y="-1828.3" font-family="Times,serif" font-size="14.00" fill="#000000">1.2.0</text>
 </g>
 <!-- org.clojure/tools.analyzer.jvm&#45;&gt;org.clojure/tools.analyzer -->
 <g id="edge9" class="edge">
