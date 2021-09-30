@@ -10,7 +10,6 @@ git_options:
 
 traits:
   JDK 8: true
-  Leiningen 2: true
 
 environment_variables:
   NVM_NODEJS_VERSION: "14"

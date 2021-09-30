@@ -90,7 +90,8 @@
                           flatten (into []))]
     (reset! options* options)
     (cond
-      (:help options) (println (main-usage summary {:args args :options options}))
+      (:help options) (do
+                        (println (main-usage summary {:args args :options options})))
       :else (do (logging/info "run with options:" (str options ) )
                 (.addShutdownHook (Runtime/getRuntime) (Thread. #(shutdown)))
                 (state/init)

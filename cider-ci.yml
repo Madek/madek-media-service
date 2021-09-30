@@ -1,11 +1,33 @@
 jobs:
 
-  build-media-service-uberjar:
-    name: Build media-service uberjar
+  backend-unit-tests:
+    name: Clojure Backend Unit Tests
     run_when:
       any branch has been updated:
         type: branch
         include_match: ^.*$
+    context:
+      task_defaults:
+        environment_variables:
+          MADEK_MEDIA_SERVICE_DIR: "{{CIDER_CI_WORKING_DIR}}"
+      tasks:
+        run-tests:
+          name: Run backend clojure unit tests
+          traits:
+            JDK 8: true
+          scripts:
+            run-tests:
+              body: |
+                ${MADEK_MEDIA_SERVICE_DIR}/bin/clj-test
+
+  build-media-service-uberjar:
+    name: Build media-service uberjar
+    depends_on: &UBERJAR_DEPENDS
+      backend-unit-tests-passed:
+        type: job
+        job_key: backend-unit-tests
+        states: [passed]
+    run_when: *UBERJAR_DEPENDS
     context:
       task_defaults:
         environment_variables:
