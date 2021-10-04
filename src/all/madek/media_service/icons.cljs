@@ -3,6 +3,7 @@
   (:require
     ["@fortawesome/react-fontawesome" :as fa-react-fontawesome :refer [FontAwesomeIcon]]
     ["@fortawesome/free-solid-svg-icons" :as fa-free-solid-svg-icons]
+    ["@fortawesome/free-brands-svg-icons" :as fa-free-brands-svg-icons]
     ))
 
 
@@ -22,6 +23,7 @@
 (defn down [] (FontAwesomeIcon #js{:icon fa-free-solid-svg-icons/faCaretSquareDown :className ""}))
 (defn download [] (FontAwesomeIcon #js{:icon fa-free-solid-svg-icons/faDownload :className ""}))
 (defn edit [] (FontAwesomeIcon #js{:icon fa-free-solid-svg-icons/faPen :className ""}))
+(defn github [] (FontAwesomeIcon #js{:icon fa-free-brands-svg-icons/faGithubSquare :className ""}))
 (defn original [] (FontAwesomeIcon #js{:icon fa-free-solid-svg-icons/faFile :className ""}))
 (defn reset [] (FontAwesomeIcon #js{:icon fa-free-solid-svg-icons/faTimes :className ""}))
 (defn save [] (FontAwesomeIcon #js{:icon fa-free-solid-svg-icons/faSave :className ""}))

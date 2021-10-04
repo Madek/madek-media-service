@@ -11,6 +11,7 @@
     [madek.media-service.resources.stores.store.groups.main :as store-groups]
     [madek.media-service.resources.stores.store.users.main :as store-users]
     [madek.media-service.resources.uploads.main :as uploads]
+    [madek.media-service.resources.main :as home]
     [madek.media-service.routes :as routes :refer [path]]
     [madek.media-service.state :as state :refer [state*]]
     [madek.media-service.utils.core :refer [keyword presence str]]
@@ -26,10 +27,11 @@
 (def resolve-table
   {:analyzers #'analyzers/page
    :analyzer #'analyzer/page
-   :uploads #'uploads/page
+   :home #'home/page
    :settings #'settings/page
-   :stores #'stores/page
    :store-users #'store-users/page
+   :stores #'stores/page
+   :uploads #'uploads/page
    :store-groups #'store-groups/page
    :original #'original/page
    })

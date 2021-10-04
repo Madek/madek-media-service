@@ -8,9 +8,7 @@
     [reagent.ratom :as ratom :refer [reaction]]))
 
 (defonce state* (reagent/atom {:now (js/Date.)
-                               :debug true}))
-
-
+                               :debug false}))
 
 (def routing-state-keys [:routing])
 

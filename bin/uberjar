@@ -25,12 +25,10 @@ function build {
   cd $PROJECT_DIR
   ./bin/clean
   rm -f $JAR_NAME
-  COMMIT_ID="$(git log -1 HEAD --pretty=%H)"
-  echo $COMMIT_ID > resources/commit-id.txt
-  echo $(date -u +"%Y-%m-%dT%H:%M:%SZ") > resources/build-timestamp.txt
+  ./bin/set-built-info
   source $PROJECT_DIR/clojure/bin/activate
   ./bin/clj-deps-graph
-  cp deps.svg resources/
+  cp deps.svg resources/media-service/public/
   ./bin/cljs-release-app
   ./bin/clj-uberjar
   ./bin/clean

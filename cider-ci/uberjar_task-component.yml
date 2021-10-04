@@ -13,6 +13,9 @@ traits:
 
 environment_variables:
   NVM_NODEJS_VERSION: "14"
+  RUBY: '{{RUBY_ENGINE}}-{{RUBY_VERSION}}'
+  RUBY_ENGINE: ruby
+  RUBY_VERSION: 2.7.2
 
 # note build-ui is strictly not necessary since build invokes it itself
 # however caching is much more efficient this way
@@ -29,4 +32,5 @@ scripts:
     exclusive_executor_resource: build_media-service_uberjar
     body: |
       . ~/.nvm/nvm.sh && nvm use "$NVM_NODEJS_VERSION"
+      export PATH=~/.rubies/$RUBY/bin:$PATH
       ${MADEK_MEDIA_SERVICE_DIR}/bin/uberjar

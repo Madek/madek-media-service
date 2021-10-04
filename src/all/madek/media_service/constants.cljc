@@ -3,6 +3,7 @@
 ;(def MIN_PART_SIZE (Math/pow 1024 2))
 ;(def MAX_PART_SIZE (* 100 (Math/pow 1024 2)))
 
+(def REPOSITORY_URL "https://github.com/Madek/madek-media-service")
 
 (def TAB-INDEX 100)
 

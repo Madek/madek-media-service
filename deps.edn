@@ -50,7 +50,7 @@
   }
  :aliases
  {;
-  :cljs {:extra-deps {thheller/shadow-cljs {:mvn/version "2.15.3"}}}
+  :cljs {:extra-deps {thheller/shadow-cljs {:mvn/version "2.15.10"}}}
   :depstar {:extra-deps {seancorfield/depstar {:mvn/version "2.0.216"}}}
   :graph {:extra-deps
           {org.clojure/tools.deps.graph

@@ -5,9 +5,9 @@
     [clojure.pprint :refer [pprint]]
     [goog.dom]
     [madek.media-service.common.http-client.modals :as http-client-modals]
+    [madek.media-service.constants :as constants]
     [madek.media-service.icons :as icons]
     [madek.media-service.routes :as routes :refer [path]]
-    ;[madek.media-service.routing :as routing]
     [madek.media-service.state :as state :refer [state* debug?*]]
     [madek.media-service.utils.core :refer [keyword presence str]]
     [madek.media-service.utils.json :as json]
@@ -49,6 +49,14 @@
    [:> bs/Navbar {:bg :light :class :navbar-light}
     [:div.container
      [:> bs/Navbar.Brand {} "Madek Media-Service"]
+     [:> bs/Nav.Item
+      {}
+      [:a {:href constants/REPOSITORY_URL}
+       [icons/github] " madek/media-service"]
+      (when-let [commit-id (some-> @state* :server-state :built-info :commit_id)]
+        [:<> [:span " @ "]
+         [:a {:href (str constants/REPOSITORY_URL "/commit/" commit-id)}
+          (subs commit-id 0 5) ]])]
      [:span
       (when-let [mode (some-> @state* :server-state :mode)]
         [:span mode])

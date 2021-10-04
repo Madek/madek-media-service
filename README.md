@@ -2,6 +2,15 @@ Madek Media Service
 ===================
 
 
+Prototyping
+-----------
+
+Remove all `media_files` etc:
+
+    TRUNCATE TABLE media_files CASCADE;
+
+
+
 Building, Development & Testing this Project
 --------------------------------------------
 

@@ -1,31 +1,29 @@
 (ns madek.media-service.state
   (:refer-clojure :exclude [str keyword])
   (:require
+    [clj-yaml.core :as yaml]
     [clojure.java.io :as io]
     [java-time]
-    [tick.alpha.api :as tick]
     [madek.media-service.utils.core :refer [keyword str presence]]
+    [tick.alpha.api :as tick]
     [taoensso.timbre :as logging]))
 
 (defonce state* (atom {}))
 
-(defn init-build-timestamp []
-  (swap! state* assoc :build-timestamp
-         (-> (if-let [build-timestamp-resource (io/resource "build-timestamp.txt")]
-                (-> build-timestamp-resource slurp clojure.string/trim tick/parse)
-                (tick/instant))
-             (tick/truncate :seconds))))
+(defn init-built-info []
+  (let [built-info (or (some-> "built-info.yml"
+                               io/resource
+                               slurp
+                               yaml/parse-string)
+                       {})]
+    (swap! state* assoc :built-info built-info)
+    (swap! state* update-in [:built-info :timestamp]
+           #(or % (str(tick/instant))))))
 
-(defn init-mode []
-  (swap! state* assoc :mode
-         (if (io/resource "build-timestamp.txt")
-           :BUILD
-           :DEV)))
 
 (defn init []
   (logging/info "initializing global state ...")
-  (init-build-timestamp)
-  (init-mode)
+  (init-built-info)
   (logging/info "initialized state " @state*))
 
 
