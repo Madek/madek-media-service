@@ -1,6 +1,7 @@
 (ns madek.media-service.state
   (:require
     [clojure.pprint :refer [pprint]]
+    [madek.media-service.utils.dom :as dom]
     [reagent.core :as reagent]
     [taoensso.timbre :as logging]
     [timothypratley.patchin :as patchin])
@@ -24,10 +25,16 @@
     #(swap! state* assoc :now (js/Date.))
     1000)
 
-(defn init [])
+(defn init []
+  (logging/info "initializing state ..." {:state @state*})
+  (if-let [user (dom/data-attribute "body" "user")]
+    (swap! state* assoc :user user)
+    (logging/warn "no user data-attribute"))
+  (if-let [server-state (dom/data-attribute "body" "server-state")]
+    (swap! state* assoc :server-state server-state)
+    (logging/warn "no server-state data-attribute"))
+  (logging/info "initialized state" {:state @state*}))
 
-
-; TODO we might have to split state* and routing-state*
 
 (defn hidden-routing-state-component
   [& {:keys [did-mount did-change did-update will-unmount]

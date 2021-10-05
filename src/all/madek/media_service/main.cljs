@@ -7,13 +7,12 @@
     [madek.media-service.routing :as routing]
     [madek.media-service.state :as state]
     [madek.media-service.utils.core :refer [keyword presence str]]
-[madek.media-service.resources.uploads.main :as uploads]
+    [madek.media-service.resources.uploads.main :as uploads]
     [taoensso.timbre :as logging]
     ))
 
-
 (defn ^:dev/after-load init [& args]
-  (logging/info "(re-)initializing application ...")
+  (js/console.log "(re-)initializing application ...")
   (service-logging/init {})
   (state/init)
   (routing/init)

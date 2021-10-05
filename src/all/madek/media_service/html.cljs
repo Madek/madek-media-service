@@ -92,10 +92,8 @@
    ])
 
 (defn mount []
-  (when-let [user (some-> js/document  .-body.dataset .-user json/from-json)]
-    (swap! state* assoc :user user))
-  (when-let [server-state (some-> js/document .-body.dataset .-serverState json/from-json)]
-    (swap! state* assoc :server-state server-state))
+  (logging/info "mounting...")
   (when-let [app (.getElementById js/document "app")]
-    (rdom/render [html] app)))
+    (rdom/render [html] app))
+  (logging/info "mounted"))
 

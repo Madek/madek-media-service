@@ -3,6 +3,7 @@
   (:require
     [hiccup.page :refer [html5 include-js include-css]]
     [clojure.tools.logging :as logging :refer [debug info warn error]]
+    [madek.media-service.utils.query-params :refer [encode-primitive]]
     [clojure.java.io :as io]
     [logbug.debug :refer [debug-ns]]
     [madek.media-service.state :refer [state*]]
@@ -34,8 +35,8 @@
    :headers {"Content-Type" "text/html"}
    :body (html5
            (head)
-           [:body {:data-user (json/to-json user)
-                   :data-server-state (json/to-json @state*)}
+           [:body {:data-user (-> user json/to-json encode-primitive)
+                   :data-server-state (-> @state* json/to-json encode-primitive)}
             [:div#app
              [:div.container
               [:h1 "Madek Media-Service"]
