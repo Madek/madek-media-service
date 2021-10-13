@@ -2,14 +2,9 @@
   (:refer-clojure :exclude [keyword str])
   (:require
     [clj-yaml.core :as yaml]
-    [clojure.tools.logging :as logging :refer [debug info warn error]]
-    [ring.middleware.accept]
-    [ring.middleware.content-type :refer [wrap-content-type]]
-    [ring.middleware.cookies]
-    [ring.middleware.json]
-    [ring.middleware.keyword-params]
-    [ring.middleware.params]
     [clojure.walk :refer [keywordize-keys]]
+    [logbug.debug :as debug :refer [I>]]
+    [logbug.ring :refer [wrap-handler-with-logging]]
     [madek.media-service.authentication :as authentication]
     [madek.media-service.db :as db]
     [madek.media-service.http.static-resources :as static-resources]
@@ -30,8 +25,14 @@
     [madek.media-service.utils.cli-options :refer [long-opt-for-key]]
     [madek.media-service.utils.core :refer [keyword presence str]]
     [madek.media-service.utils.http.anti-csrf-back :as anti-csrf]
-    [logbug.debug :as debug :refer [I>]]
-    [logbug.ring :refer [wrap-handler-with-logging]]
+    [madek.media-service.utils.ring-exception :as ring-exception]
+    [ring.middleware.accept]
+    [ring.middleware.content-type :refer [wrap-content-type]]
+    [ring.middleware.cookies]
+    [ring.middleware.json]
+    [ring.middleware.keyword-params]
+    [ring.middleware.params]
+    [taoensso.timbre :as logging]
     ))
 
 
@@ -140,7 +141,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn build-routes []
-  (I> wrap-handler-with-logging
+  (-> ; I> wrap-handler-with-logging
       not-found-handler
       wrap-route-dispatch
       ;(logbug.ring/wrap-handler-with-logging :info)
@@ -167,13 +168,14 @@
             [#".*[^\/]*\d+\.\d+\.\d+.+"  ; match semver in the filename
              #".+\.[0-9a-fA-F]{32,}\..+"] ; match MD5, SHAx, ... in the filename
             :cache-enabled? (cache-busting-enabled-key @options*)})
+      ring-exception/wrap
       wrap-content-type))
 
 (defn init [options]
   (reset! options* (select-keys options options-keys))
-  (info "initializing routing " @options* " ...")
+  (logging/info "initializing routing " @options* " ...")
   (reset! handler-chain* (build-routes))
-  (info "initialized routing")
+  (logging/info "initialized routing")
   @handler-chain*)
 
 ;(logbug.debug/debug-ns 'madek.media-service.resources.ws-back)

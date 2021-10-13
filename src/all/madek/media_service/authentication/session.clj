@@ -83,4 +83,4 @@
     (handle handler request)))
 
 ;### Debug ####################################################################
-(logbug.debug/debug-ns *ns*)
+;(logbug.debug/debug-ns *ns*)
