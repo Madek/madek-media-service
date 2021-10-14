@@ -69,6 +69,17 @@ describe "Users", type: :feature do
             expect(page).to have_content "Liana Warner (liana@example.com)"
           end
         end
+
+        specify "resetting filters" do
+          fill_in "term", with: "arn"
+
+          expect(page).to have_css("table.users tbody tr", count: 2)
+
+          click_link "reset-query-params"
+
+          expect(page).to have_css("table.users tbody tr", count: 4)
+          expect(page).to have_field("term", with: "")
+        end
       end
     end
 
@@ -77,14 +88,7 @@ describe "Users", type: :feature do
         expect(page).to have_css(".direct-priority-component", text: "-", count: 4)
         expect(page).to have_css(".combined-priority-component", text: "-", count: 4)
 
-        within "tr[data-id='#{user.id}'] .direct-priority-component" do
-          click_button "Edit"
-        end
-
-        expect(page).to have_css(".modal")
-        fill_in "direct_priority", with: 5
-
-        within(".modal") { click_button "Save" }
+        set_direct_priority_of(user, to: 5)
 
         expect(page).to have_css('table.users tbody tr', count: 4)
         within "tr[data-id='#{user.id}'] .combined-priority-component" do
@@ -93,21 +97,8 @@ describe "Users", type: :feature do
       end
 
       it "is deletable" do
-        within "tr[data-id='#{user_2.id}'] .direct-priority-component" do
-          click_button "Edit"
-        end
-        within ".modal" do
-          fill_in "direct_priority", with: 3
-          click_button "Save"
-        end
-
-        within "tr[data-id='#{user_2.id}'] .direct-priority-component" do
-          click_button "Edit"
-        end
-        within ".modal" do
-          fill_in "direct_priority", with: ""
-          click_button "Save"
-        end
+        set_direct_priority_of(user_2, to: 3)
+        set_direct_priority_of(user_2, to: "")
 
         within "tr[data-id='#{user_2.id}'] .direct-priority-component" do
           expect(page).to have_content "-"
@@ -117,5 +108,83 @@ describe "Users", type: :feature do
         end
       end
     end
+
+    describe "managing" do
+      it "navigates to groups page" do
+        within "table.users tbody tr[data-id='#{user_2.id}']" do
+          click_link "Manage"
+
+          expect(page).to have_current_path(
+            "/media-service/stores/database/groups/?including-user=#{user_2.id}"
+          )
+        end
+      end
+    end
+
+    describe "user's combined priority" do
+      context "when user belongs to a group" do
+        let!(:group) { create(:group) }
+
+        before do
+          group.users << user
+
+          set_direct_priority_of(user, to: 4)
+        end
+
+        context "and group's priority value is higher" do
+          it "display correct combined priority" do
+            within "tr[data-id='#{user.id}'" do
+              click_link "Manage"
+            end
+            within("tr[data-id='#{group.id}']") { click_button "Edit" }
+            within ".modal" do
+              fill_in "priority", with: 5
+              click_button "Save"
+            end
+
+            visit path
+
+            within "tr[data-id='#{user.id}']" do
+              expect(page).to have_css(".combined-priority-component", text: 5)
+              expect(page).to have_css(".direct-priority-component", text: 4)
+              expect(page).to have_css(".groups-priority-component", text: 5)
+            end
+          end
+        end
+
+        context "and group's priority value is lower" do
+          it "display correct combined priority" do
+            within "tr[data-id='#{user.id}'" do
+              click_link "Manage"
+            end
+            within("tr[data-id='#{group.id}']") { click_button "Edit" }
+            within ".modal" do
+              fill_in "priority", with: 3
+              click_button "Save"
+            end
+
+            visit path
+
+            within "tr[data-id='#{user.id}']" do
+              expect(page).to have_css(".combined-priority-component", text: 4)
+              expect(page).to have_css(".direct-priority-component", text: 4)
+              expect(page).to have_css(".groups-priority-component", text: 3)
+            end
+          end
+        end
+      end
+    end
   end
+end
+
+def set_direct_priority_of(user, to:)
+  within "tr[data-id='#{user.id}'] .direct-priority-component" do
+    click_button "Edit"
+  end
+  within ".modal" do
+    fill_in "direct_priority", with: to
+    click_button "Save"
+  end
+
+  expect(page).not_to have_css(".modal")
 end

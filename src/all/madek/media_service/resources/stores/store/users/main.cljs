@@ -102,7 +102,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn groups-priority-component [user]
-  [:div
+  [:div.groups-priority-component
    (if-let [p (:groups_priority user)]
      [:span.text-monospace p]
      [:span "-"])

@@ -53,7 +53,7 @@ describe "Resources" do
           expect(response.status).to eq(200)
         end
 
-        it "returns users for the store" do
+        it "returns groups for the store" do
           expect(parsed_body).to eq({
             groups: [
               {

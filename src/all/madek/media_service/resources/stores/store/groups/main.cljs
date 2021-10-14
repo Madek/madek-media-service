@@ -93,11 +93,11 @@
     ]])
 
 (defn group-row-component [group]
-  [:tr
+  [:tr {:data-id (:key group)}
    [:td.text-monospace (:index group)]
    [:td.text-center [group-name-ident-component group]]
    [:td.text-right [priority-component group]]
-   [:td.text-right.text-monospace (:users_count group)]
+   [:td.text-right.text-monospace.users-count (:users_count group)]
    ])
 
 (defn groups-table-component [groups]
