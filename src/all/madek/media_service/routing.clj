@@ -113,6 +113,12 @@
       "text/css" :qs 1 :as :css
       "text/html" :qs 1 :as :html]}))
 
+(defn wrap-add-vary-header [handler]
+  "should be used if content varies based on `Accept` header, e.g. if using `ring.middleware.accept`"
+  (fn [request]
+    (let [response (handler request)]
+      (assoc-in response [:headers "Vary"] "Accept"))))
+
 (defn wrap-parsed-query-params [handler]
   (fn [request]
     (handler
@@ -159,6 +165,7 @@
       ring.middleware.params/wrap-params
       ;(logbug.ring/wrap-handler-with-logging :info)
       wrap-accept
+      wrap-add-vary-header
       ring.middleware.cookies/wrap-cookies
       db/wrap-tx
       (static-resources/wrap
