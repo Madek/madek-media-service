@@ -1,4 +1,4 @@
-require 'requests/shared/authorization_error'
+require 'requests/shared/system_admin_error'
 
 describe "Resources" do
   describe "Groups: /media-service/stores/:store_id/groups/", type: :request do
@@ -12,19 +12,19 @@ describe "Resources" do
     context "with public access" do
       let(:user) { nil }
 
-      it_raises "authorization error"
+      it_raises "system admin error"
     end
 
     context "for an ordinary user" do
       let(:user) { create(:user) }
 
-      it_raises "authorization error"
+      it_raises "system admin error"
     end
 
     context "for an user with admin role" do
       let(:user) { create(:user, :with_admin_role) }
 
-      it_raises "authorization error"
+      it_raises "system admin error"
     end
 
     context "for user with system admin role" do

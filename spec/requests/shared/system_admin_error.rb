@@ -2,7 +2,7 @@ RSpec.configure do |c|
   c.alias_it_should_behave_like_to :it_raises
 end
 
-shared_examples "authorization error" do
+shared_examples "system admin error" do
   let(:api_token) do
     create(:api_token, user: user, scope_write: true) if user
   end
@@ -13,6 +13,6 @@ shared_examples "authorization error" do
   end
 
   it "responds with error message" do
-    expect(response.body).to include("Sign-in required")
+    expect(response.body).to include("System-admin scope required")
   end
 end

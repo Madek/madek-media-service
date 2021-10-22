@@ -11,7 +11,7 @@ describe "Authorization" do
       context "with invalid token" do
         let(:user_token) { "invalid" }
 
-        it "responds with 401" do
+        it "responds with 401 Unauthorized status" do
           expect(response.status).to eq(401)
         end
 
@@ -23,7 +23,7 @@ describe "Authorization" do
       context "when token is revoked" do
         let(:api_token) { create(:api_token, user: user, revoked: true) }
 
-        it "responds with 401" do
+        it "responds with 401 Unauthorized status" do
           expect(response.status).to eq(401)
         end
 
@@ -35,7 +35,7 @@ describe "Authorization" do
       context "when token's scope_read is set to false" do
         let(:api_token) { create(:api_token, user: user, scope_read: false) }
 
-        it "responds with 403" do
+        it "responds with 403 Forbidden status" do
           expect(response.status).to eq(403)
         end
 
@@ -46,24 +46,24 @@ describe "Authorization" do
       end
 
       context "for an ordinary user" do
-        it "responds with 500" do
-          expect(response.status).to eq(500)
+        it "responds with 403 Forbidden status" do
+          expect(response.status).to eq(403)
         end
 
         it "responds with error message" do
-          expect(response.body).to eq("System-admin scope required")
+          expect(response.body).to include("System-admin scope required")
         end
       end
 
       context "for an user with admin role" do
         let(:user) { create(:user, :with_admin_role) }
 
-        it "responds with 500" do
-          expect(response.status).to eq(500)
+        it "responds with 403 Forbidden status" do
+          expect(response.status).to eq(403)
         end
 
         it "responds with error message" do
-          expect(response.body).to eq("System-admin scope required")
+          expect(response.body).to include("System-admin scope required")
         end
       end
         
@@ -89,7 +89,7 @@ describe "Authorization" do
           let(:api_token) { create(:api_token, user: user, scope_write: false) }
 
           context "when token's scope_write is set to false" do
-            it "responds with 403" do
+            it "responds with 403 Forbidden status" do
               expect(response.status).to eq(403)
             end
 

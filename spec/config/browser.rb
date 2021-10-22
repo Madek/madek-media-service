@@ -71,23 +71,21 @@ end
 
 
 RSpec.configure do |config|
-  set_capybara_values
-
   # Capybara.run_server = false
   Capybara.default_driver = :firefox
   Capybara.current_driver = :firefox
 
 
-  config.before :all do
+  config.before(:all, type: :feature) do
     set_capybara_values
     maximize_window_if_possible
   end
 
-  config.before :each do |example|
+  config.before(:each, type: :feature) do |example|
     set_capybara_values
   end
 
-  config.after(:each) do |example|
+  config.after(:each, type: :feature) do |example|
     unless example.exception.nil?
       take_screenshot screenshot_dir
     end
