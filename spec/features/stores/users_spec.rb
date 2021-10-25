@@ -3,7 +3,7 @@ require "features/shared/authorization_error"
 
 describe "Users", type: :feature do
   let!(:store) { create(:media_store, :database) }
-  let(:path) { "/media-service/stores/database/users/" } 
+  let(:path) { "/media-service/stores/database/users/" }
 
   context "for public" do
     before do
