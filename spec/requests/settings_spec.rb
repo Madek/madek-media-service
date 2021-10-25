@@ -1,4 +1,4 @@
-require 'requests/shared/authorization_error'
+require 'requests/shared/system_admin_error'
 
 describe "Resources" do
   describe "Settings: /media-service/settings/", type: :request do
@@ -6,22 +6,43 @@ describe "Resources" do
     let(:response) { request }
     let(:user) { create(:user, :with_system_admin_role) }
 
+    # shared_examples "system admin access only" do
+    #   let(:api_token) do
+    #     create(:api_token, user: user, scope_write: true) if user
+    #   end
+    #   let(:user_token) { api_token&.token_hash }
+
+    #   it "responds with 403 Forbidden status" do
+    #     expect(response.status).to eq(403)
+    #   end
+
+    #   it "responds with error message" do
+    #     expect(response.body).to include("System-admin scope required")
+    #   end
+    # end
+
     context "with public access" do
       let(:user) { nil }
 
-      it_raises "authorization error"
+      # it_raises "authorization error"
+      # include_examples "system admin access only"
+      it_raises "system admin error"
     end
 
     context "for an ordinary user" do
       let(:user) { create(:user) }
 
-      it_raises "authorization error"
+      # it_raises "authorization error"
+      # include_examples "system admin access only"
+      it_raises "system admin error"
     end
 
     context "for an user with admin role" do
       let(:user) { create(:user, :with_admin_role) }
 
-      it_raises "authorization error"
+      # it_raises "authorization error"
+      # include_examples "system admin access only"
+      it_raises "system admin error"
     end
 
     context "for user with system admin role" do
