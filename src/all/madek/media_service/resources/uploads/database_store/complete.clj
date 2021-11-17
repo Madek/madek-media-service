@@ -34,19 +34,6 @@
       (sql/order-by [:part :asc])
       (->> (sql-format) (jdbc/query @db/ds*))))
 
-(defn part-reducer [tx agg part]
-  (let [blob (-> (sql/from :media_file_parts)
-                 (sql/select :blob)
-                 (sql/where [:= :id (:id part)])
-                 (->> (sql-format) (jdbc/query tx) first :blob))]
-    (. (:md5 agg) update blob)
-    (. (:sha256 agg) update blob)
-    (-> agg
-        (update-in [:start] (fn [current-start]
-                              (when-not (= current-start (:start part))
-                                (throw (ex-info "start doesn't match" {:part part})))
-                              (+ current-start (:size part)))))))
-
 (defn hexlify [bx]
   (->> bx
        (map #(format "%02x" (bit-and % 0xff)))
@@ -82,12 +69,53 @@
       (sql/returning :*)
       (->> sql-format (db/execute! tx))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn part-reducer [tx agg part]
+  (let [blob (-> (sql/from :media_file_parts)
+                 (sql/select :blob)
+                 (sql/where [:= :id (:id part)])
+                 (->> (sql-format) (jdbc/query tx) first :blob))]
+    (. (:md5 agg) update blob)
+    (. (:sha256 agg) update blob)
+    (-> agg
+        (update-in [:start] (fn [current-start]
+                              (when-not (= current-start (:start part))
+                                (throw (ex-info "start doesn't match" {:part part})))
+                              (+ current-start (:size part)))))))
+
+(defn reduce-parts-checksum [tx parts upload]
+  (->> (parts upload :tx tx)
+       (reduce
+         (partial part-reducer tx)
+         {:start 0
+          :sha256 (MessageDigest/getInstance "SHA-256")
+          :md5 (MessageDigest/getInstance "MD5")})
+       (finalize-reduction)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 (defn update-upload [tx id params]
-  (-> (sql/update :uploads)
-      (sql/where [:= :id id])
-      (sql/set params)
-      (sql/returning :*)
-      (->> sql-format (db/execute! tx))))
+(-> (sql/update :uploads)
+    (sql/where [:= :id id])
+    (sql/set params)
+    (sql/returning :*)
+    (->> sql-format (db/execute! tx))))
+
+(defn update-parts [tx upload original]
+(-> (sql/update :media_file_parts)
+    (sql/where [:= :upload_id (:id upload)])
+    (sql/set {:media_file_id (:id original)})
+    (->> sql-format (db/execute! tx))))
+
+(defn create-inspection [tx original]
+(-> (sql/insert-into :inspections)
+    (sql/values [{:media_file_id (:id original)}])
+    (->> sql-format (db/execute! tx))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 (defn complete-next-upload []
   (jdbc/with-db-transaction [tx @db/ds*]
@@ -95,13 +123,7 @@
       (jdbc/with-db-transaction [tx @db/ds*]
         (try
           (logging/info " finishing completed upload " completed-upload)
-          (let [reduction (->> (parts completed-upload :tx tx)
-                               (reduce
-                                 (partial part-reducer tx)
-                                 {:start 0
-                                  :sha256 (MessageDigest/getInstance "SHA-256")
-                                  :md5 (MessageDigest/getInstance "MD5")})
-                               (finalize-reduction))]
+          (let [reduction (reduce-parts-checksum tx parts completed-upload)]
             (validate-check-sums! completed-upload reduction)
             (let [original (create-original tx (merge completed-upload reduction))
                   finished-upload (update-upload tx (:id completed-upload)
@@ -109,10 +131,8 @@
                                                   :md5 (:md5 reduction)
                                                   :sha256 (:sha256 reduction)
                                                   :media_file_id (:id original)})]
-              (-> (sql/update :media_file_parts)
-                  (sql/where [:= :upload_id (:id finished-upload)])
-                  (sql/set {:media_file_id (:id original)})
-                  (->> sql-format (db/execute! tx)))))
+              (update-parts tx finished-upload original)
+              (create-inspection tx original)))
           (catch Exception ex
             (jdbc/db-set-rollback-only! tx)
             (-> (sql/update :uploads)

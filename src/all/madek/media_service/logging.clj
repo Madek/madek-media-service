@@ -3,6 +3,7 @@
   (:require
     [clojure.tools.logging :as logging]
     [environ.core :refer [env]]
+    [madek.media-service.constants :as constants]
     [madek.media-service.utils.cli-options :refer [long-opt-for-key]]
     [madek.media-service.utils.core :refer [keyword presence str]]
     [taoensso.timbre :as timbre :refer [debug info]]
@@ -37,6 +38,7 @@
 (defn init [all-options]
   (reset! options* (select-keys all-options options-keys))
   (info "initializing logging " @options*)
+  (timbre/merge-config! constants/DEFAULT_LOGGING_CONFIG)
   (doseq [configfile (:logging-config-file @options*)]
     (info 'configfile configfile)
     (when-let [content (slurp configfile)]

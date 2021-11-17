@@ -3,8 +3,8 @@
   (:require
     [clojure.pprint :refer [pprint]]
     [reitit.core :as reitit]
-    [madek.media-service.resources.analyzers.analyzer.main :as analyzer]
-    [madek.media-service.resources.analyzers.main :as analyzers]
+    [madek.media-service.resources.inspectors.inspector.main :as inspector]
+    [madek.media-service.resources.inspectors.main :as inspectors]
     [madek.media-service.resources.originals.original.main :as original]
     [madek.media-service.resources.settings.main :as settings]
     [madek.media-service.resources.stores.main :as stores]
@@ -25,8 +25,8 @@
     ))
 
 (def resolve-table
-  {:analyzers #'analyzers/page
-   :analyzer #'analyzer/page
+  {:inspectors #'inspectors/page
+   :inspector #'inspector/page
    :home #'home/page
    :settings #'settings/page
    :store-users #'store-users/page

@@ -12,7 +12,7 @@
     [madek.media-service.resources.uploads.database-store.main :as database-store]
     [madek.media-service.routes :as routes :refer [path]]
     [madek.media-service.utils.core :refer [keyword presence presence! str]]
-    [taoensso.timbre :as logging]))
+    [taoensso.timbre :as logging :refer [debug info warn error spy]]))
 
 
 (defn user-media-store-id-query [user-id requested-media-store-id]
@@ -125,7 +125,7 @@
                       (sql/where [:= :uploads.id upload-id])
                       (sql/where [:= :uploads.uploader_id current-user-id])
                       (sql/where [:= :uploads.state "started"])
-                      sql-format (->> (logging/spy :info) (jdbc/query tx) first))]
+                      sql-format (->> spy (jdbc/query tx) first))]
     (case (:media_store_type upload)
       "database" (database-store/put-part upload request)
       (throw (ex-info "media-store type not supported yet" {:status 500})))

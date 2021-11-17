@@ -39,7 +39,7 @@
        [:> bs/NavDropdown.Item {:href (path :madek-admin)} [icons/admin-interface] " Madek admin interface"]
        [:> bs/NavDropdown.Item {:href (path :my)} " My archive"]
        [:> bs/NavDropdown.Item {:href (path :settings)} [icons/admin-interface] " Settings"]
-       [:> bs/NavDropdown.Item {:href (path :analyzers)} [icons/analyzers] " Analyzers "]
+       [:> bs/NavDropdown.Item {:href (path :inspectors)} [icons/inspectors] " Inspectors "]
        [:> bs/NavDropdown.Item {:href (path :stores)} [icons/stores] " Media-Stores"]
        [:> bs/NavDropdown.Item {:href (path :uploads)} [icons/upload] " Upload"]
        ])]])

@@ -83,8 +83,8 @@ describe "Settings", type: :feature do
                                    with: default_upload_min_part_size)
       end
 
-      specify "private_key field is disabled and has no value" do
-        expect(page).to have_field("private_key", type: "text", disabled: true, with: "")
+      specify "key_private field is disabled and has no value" do
+        expect(page).to have_field("key_private", type: "text", disabled: true, with: "")
       end
 
       specify "reset values to default buttons are disabled" do
@@ -92,14 +92,14 @@ describe "Settings", type: :feature do
       end
 
       describe "updating settings" do
-        let(:private_key) { "PRIVATE_KEY_!@#" }
+        let(:key_private) { "PRIVATE_KEY_!@#" }
 
         it "updates them" do
           click_link "Edit"
 
           fill_in "upload_max_part_size", with: 12 * 1024 ** 2
           fill_in "upload_min_part_size", with: 10 * 1024 ** 2
-          fill_in "private_key", with: private_key
+          fill_in "key_private", with: key_private
 
           click_button "Save"
 
@@ -111,7 +111,7 @@ describe "Settings", type: :feature do
                                      type: "number",
                                      disabled: true,
                                      with: 10 * 1024 ** 2)
-          expect(page).to have_field("private_key", type: "text", disabled: true, with: private_key)
+          expect(page).to have_field("key_private", type: "text", disabled: true, with: key_private)
         end
       end
 

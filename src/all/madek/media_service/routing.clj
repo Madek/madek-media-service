@@ -5,11 +5,13 @@
     [clojure.walk :refer [keywordize-keys]]
     [logbug.debug :as debug :refer [I>]]
     [logbug.ring :refer [wrap-handler-with-logging]]
-    [madek.media-service.authentication :as authentication]
+    [madek.media-service.authentication.main :as authentication]
+    [madek.media-service.authorization.main :as authorization]
     [madek.media-service.db :as db]
     [madek.media-service.http.static-resources :as static-resources]
-    [madek.media-service.resources.analyzers.analyzer.main :as analyzer]
-    [madek.media-service.resources.analyzers.main :as analyzers]
+    [madek.media-service.resources.inspections.main :as inspections]
+    [madek.media-service.resources.inspectors.inspector.main :as inspector]
+    [madek.media-service.resources.inspectors.main :as inspectors]
     [madek.media-service.resources.originals.original.main :as original]
     [madek.media-service.resources.settings.main :as settings]
     [madek.media-service.resources.spa-back :as spa]
@@ -32,7 +34,7 @@
     [ring.middleware.json]
     [ring.middleware.keyword-params]
     [ring.middleware.params]
-    [taoensso.timbre :as logging]
+    [taoensso.timbre :as logging :refer [debug info warn error spy]]
     ))
 
 
@@ -54,8 +56,9 @@
 ;;; routing ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def resolve-table
-  {:analyzers #'analyzers/handler
-   :analyzer #'analyzer/handler
+  {:inspections #'inspections/handler
+   :inspector #'inspector/handler
+   :inspectors #'inspectors/handler
    :original #'original/handler
    :original-content #'original/handler
    :settings #'settings/handler
@@ -73,8 +76,10 @@
    :ws #'ws/handler})
 
 (defn route-resolve [handler request]
+  (debug 'route-resolve (:uri request))
   (if-let [route (routes/route (:uri request))]
     (let [{{route-name :name} :data} route]
+      (debug "route match" route-name)
       (handler (-> request
                    (assoc
                      :route route
@@ -126,32 +131,15 @@
              (->> request :query-params
                   (map (fn [[k v]] [(keyword  k) (yaml/parse-string v)]))
                   (into {}))))))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn authorize! [handler request]
-  (let [authorizers (get-in request [:route :data :authorizers] #{})]
-    (doseq [authorizer authorizers]
-      (case authorizer
-        :admin (when-not (get-in request [:authenticated-entity :is_admin])
-                 (throw (ex-info "Admin scope required" {:status 403})))
-        :user (when-not (get-in request [:authenticated-entity :user_id])
-                (throw (ex-info "Sign-in required" {:status 403})))
-        :system-admin (when-not (get-in request [:authenticated-entity :is_system_admin])
-                        (throw (ex-info "System-admin scope required" {:status 403})))))
-    (handler request)))
-
-(defn wrap-authorize! [handler]
-  (fn [request] (authorize! handler request)))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn build-routes []
-  (-> ; I> wrap-handler-with-logging
+  (-> ;I> wrap-handler-with-logging
       not-found-handler
       wrap-route-dispatch
       ;(logbug.ring/wrap-handler-with-logging :info)
-      wrap-authorize!
+      authorization/wrap-authorize!
       spa/wrap
       settings/wrap-assoc-settings
       authentication/wrap
@@ -163,7 +151,7 @@
       wrap-parsed-query-params
       ring.middleware.keyword-params/wrap-keyword-params
       ring.middleware.params/wrap-params
-      ;(logbug.ring/wrap-handler-with-logging :info)
+      ;(logbug.ring/wrap-handler-with-logging :debug)
       wrap-accept
       wrap-add-vary-header
       ring.middleware.cookies/wrap-cookies

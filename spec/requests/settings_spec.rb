@@ -60,7 +60,9 @@ describe "Resources" do
         it "returns settings" do
           expect(without_timestamps(parsed_body)).to eq({
             id: 0,
-            private_key: nil,
+            key_private: nil,
+            key_public: nil,
+            key_algo: nil,
             upload_min_part_size: 1024 ** 2,
             upload_max_part_size: 100 * 1024 ** 2,
           }.deep_stringify_keys)
@@ -71,7 +73,9 @@ describe "Resources" do
         let(:params) do
           {
             id: 0,
-            private_key: "PRIVATE_KEY",
+            key_private: "PRIVATE_KEY",
+            key_public: "PUBLIC_KEY",
+            key_algo: nil,
             upload_min_part_size: 10 * 1024 ** 2,
             upload_max_part_size: 12 * 1024 ** 2
           }

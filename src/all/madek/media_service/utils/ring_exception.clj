@@ -39,7 +39,7 @@
         (let [resp (exception-response e)]
           (case (:status resp)
             (401 403) (logging/warn (logstr e) {:request request})
-            (logging/error (logstr e) {:request request}))
+            (logging/error (ex-message e) (ex-data e) (logstr e) {:request request}))
           resp)))))
 
 ;#### debug ###################################################################

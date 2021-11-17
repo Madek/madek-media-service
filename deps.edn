@@ -8,9 +8,10 @@
   cli-matic/cli-matic {:mvn/version "0.4.3"}
   clj-commons/clj-yaml {:mvn/version "0.7.107"}
   clj-pid/clj-pid {:mvn/version "0.1.2"}
-  cljc.java-time/cljc.java-time {:mvn/version "0.1.16"}
+  ;cljc.java-time/cljc.java-time {:mvn/version "0.1.16"}
   cljs-http/cljs-http {:mvn/version "0.1.46"}
   clojure-humanize/clojure-humanize {:mvn/version "0.2.2"}
+  clojure.java-time/clojure.java-time {:mvn/version "0.3.3"}
   com.codahale.metrics/metrics-core {:mvn/version "3.0.2"}
   com.codahale.metrics/metrics-healthchecks {:mvn/version "3.0.2"}
   com.fzakaria/slf4j-timbre {:mvn/version "0.3.21"}
@@ -21,6 +22,7 @@
   compojure/compojure {:mvn/version "1.6.2"}
   digest/digest {:mvn/version "1.4.10"}
   environ/environ {:mvn/version "1.2.0"}
+  funcool/cuerdas {:mvn/version "2021.05.29-0"}
   hiccup/hiccup {:mvn/version "1.0.5"}
   hikari-cp/hikari-cp {:mvn/version "2.13.0"}
   http-kit/http-kit {:mvn/version "2.5.3"}

@@ -4,7 +4,8 @@ windows:
     name: back-repl-run
     command: |
       export DB_NAME=madek
-      export LOGGING_CONFIG_FILE=log-conf-dev.edn
+      export PGDATAVASE=madek
+      # export LOGGING_CONFIG_FILE=log-conf-dev.edn
       # we need do wait for the front-end to build the assets before we start up
       sleep 30
       ./bin/clj-run run
@@ -15,7 +16,7 @@ windows:
   5:
     name: psql
     command: |
-      psql -d madek_v3
+      psql -d madek
   6:
     name: datalayer
     command: |

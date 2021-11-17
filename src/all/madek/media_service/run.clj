@@ -7,7 +7,7 @@
     [clojure.tools.logging :as logging]
     [environ.core :refer [env]]
     [madek.media-service.db :as db]
-    [madek.media-service.resources.analyzers.main :as analyzers]
+    [madek.media-service.resources.inspectors.main :as inspectors]
     [madek.media-service.resources.settings.main :as settings]
     [madek.media-service.http.server :as http-server]
     [madek.media-service.logging :as service-logging]
@@ -110,7 +110,7 @@
   (state/init)
   (db-store-complete/init)
   (settings/init)
-  (analyzers/init)
+  (inspectors/init)
   (init-http))
 
 ; reload/restart stuff when requiring this file in dev mode

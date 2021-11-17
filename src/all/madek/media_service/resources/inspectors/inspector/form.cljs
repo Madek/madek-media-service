@@ -1,4 +1,4 @@
-(ns madek.media-service.resources.analyzers.analyzer.form
+(ns madek.media-service.resources.inspectors.inspector.form
   (:refer-clojure :exclude [keyword str])
   (:require
     [clojure.core.async :as async :refer []]
@@ -20,7 +20,7 @@
 ;(defonce mode* (reagent/atom :view))
 
 (defn put [data after-success]
-  (go (when-let [result-data (some-> {:url (path :analyzer {:analyzer-id (:id data)})
+  (go (when-let [result-data (some-> {:url (path :inspector {:inspector-id (:id data)})
                                       :method :put
                                       :json-params data}
                                      http-client/request :chan <!
@@ -71,7 +71,7 @@
        [:pre (with-out-str (pprint @data*))]]
       [:div
        [:h3 "url"]
-       [:code (path :analyzer {:analyzer-id (:id @data*)})]]
+       [:code (path :inspector {:inspector-id (:id @data*)})]]
 
 
       ])])

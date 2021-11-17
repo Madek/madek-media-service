@@ -58,10 +58,16 @@
     :type :number
     :disabled (-> @data* :edit boolean not)
     :reset-default constants/MIN_PART_SIZE_DEFAULT]
-   [forms/input-component data* [url :private_key]
+   [forms/input-component data* [url :key_private]
     :disabled (-> @data* :edit boolean not)
     :element :textarea
     :rows (if (:edit @data*) 7 2)]
+   [forms/input-component data* [url :key_public]
+    :disabled (-> @data* :edit boolean not)
+    :element :textarea
+    :rows (if (:edit @data*) 7 2)]
+   [forms/input-component data* [url :key_algo]
+    :disabled (-> @data* :edit boolean not)]
    (when (:edit @data*)
      [:div
       [:button.btn.btn-danger.float-left

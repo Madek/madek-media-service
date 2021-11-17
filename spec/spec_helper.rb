@@ -1,5 +1,7 @@
 ENV["RAILS_ENV"] = "test"
 
+PROJECT_DIR= Pathname(File.expand_path(File.dirname(__FILE__) + ("/..")))
+
 def base_url
   @base_url ||= ENV['MADEK_MEDIA_SERVICE_HTTP_BASE_URL'].presence || 'http://localhost:3180'
 end

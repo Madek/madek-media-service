@@ -22,3 +22,15 @@
 ;(def ^:dynamic MIN_PART_SIZE 10)
 ;(def ^:dynamic MAX_PART_SIZE 100)
 
+(def ALLOWED_JWT_ALGOS #{:es256, :es512
+                         :eddsa,
+                         :rs256, :rs512})
+
+(def DEFAULT_LOGGING_CONFIG
+  {:min-level [[#{"madek.media-service.resources.inspections.*"
+                  "madek.media-service.resources.originals.original.*"
+                  } :debug]
+               [#{"madek.media-service.*"} :info]
+               [#{"*"} :warn]]
+   :log-level nil})
+

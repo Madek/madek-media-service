@@ -1,10 +1,10 @@
-(ns madek.media-service.resources.analyzers.analyzer.main
+(ns madek.media-service.resources.inspectors.inspector.main
   (:refer-clojure :exclude [keyword str])
   (:require
     [clojure.core.async :as async :refer []]
     [clojure.pprint :refer [pprint]]
     [madek.media-service.common.components.misc :refer [wait-component]]
-    [madek.media-service.resources.analyzers.analyzer.form :as analyzer-form]
+    [madek.media-service.resources.inspectors.inspector.form :as inspector-form]
     [madek.media-service.common.forms.core :as forms]
     [madek.media-service.common.http-client.core :as http-client]
     [madek.media-service.icons :as icons]
@@ -60,7 +60,7 @@
      {:on-submit (fn [e]
                    (.preventDefault e)
                    (go (when (some->
-                               {:url (path :analyzer {:analyzer-id (:id @view-data*)})
+                               {:url (path :inspector {:inspector-id (:id @view-data*)})
                                 :method :delete}
                                http-client/request :chan <!
                                http-client/filter-success)
@@ -70,24 +70,24 @@
                          ; emulate a click so we are processing the event properly in the history stuff
                          ; there should be a nicer way to do this
                          (some-> js/document
-                                 (.getElementById "back-to-analyzers-after-delete")
+                                 (.getElementById "back-to-inspectors-after-delete")
                                  (.click)))))}
      [:a {:style {:display :none}
-          :id "back-to-analyzers-after-delete"
-          :href (path :analyzers)}]
+          :id "back-to-inspectors-after-delete"
+          :href (path :inspectors)}]
      [:button.btn.btn-danger.float-right
       [icons/delete] " Delete"]]]])
 
-(defn analyzer-component [mode*]
-  [:div.analyzer-component
+(defn inspector-component [mode*]
+  [:div.inspector-component
    (cond
      ;;; view
      (#{:view} @mode*)
-     [analyzer-form/form-component view-data* mode*]
+     [inspector-form/form-component view-data* mode*]
      ;;; edit
      (#{:edit} @mode*)
      (let [form-data* (reagent/atom @view-data*)]
-       (analyzer-form/form-component
+       (inspector-form/form-component
          form-data* mode*
          :on-cancel #(reset! mode* :view)
          :after-success (fn [updated-data]
@@ -101,15 +101,15 @@
 (defn page []
   (reagent/with-let [mode* (reagent/atom :view)]
     [:div.page
-     {:id :analyzer-page}
+     {:id :inspector-page}
      [state/hidden-routing-state-component
       :did-change fetch]
      (when (#{:view} @mode*)
        [:div.float-right
         [delete-button-component mode*]
         [edit-button-component mode*]])
-     [:h2 "Analyzer "
+     [:h2 "Inspector "
       [:span.text-monospace
-       (some-> @routing-state* :path-params :analyzer-id)]]
-     [analyzer-component mode*]
+       (some-> @routing-state* :path-params :inspector-id)]]
+     [inspector-component mode*]
      [debug-component mode*]]))

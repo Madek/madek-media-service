@@ -34,9 +34,13 @@ describe "Uploads", type: :feature do
     end
 
     it "allows to upload a file" do
+      expect(true).to be
+      binding.pry
+
       within "#uploads-page .form" do
         attach_file nil, "spec/support/files/small.txt"
       end
+
 
       expect(page).to have_css(".modal-body",
                                text: /POST \/media-service\/uploads\/[a-z0-9-]+\/complete/)

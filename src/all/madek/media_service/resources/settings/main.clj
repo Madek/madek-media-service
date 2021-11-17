@@ -10,18 +10,31 @@
     [madek.media-service.db :as db]
     [madek.media-service.routes :as routes :refer [path]]
     [madek.media-service.utils.core :refer [keyword presence str]]
-    [madek.media-service.utils.pki :as pki]
+    [madek.media-service.common.pki.keygen :as pki.keygen]
     [taoensso.timbre :as logging]))
 
-(def accepted-keys [:private_key :upload_max_part_size :upload_min_part_size])
+(def accepted-keys [:key_public :key_private :key_algo :upload_max_part_size :upload_min_part_size])
+
+(defn create-settings []
+  (let [[private-key public-key algo] (pki.keygen/gen-key-pair)]
+    (jdbc/execute! @db/ds*
+                   (-> (sql/insert-into :media_service_settings)
+                       (sql/values [{:key_private private-key
+                                     :key_public public-key
+                                     :key_algo algo}])
+                       (sql/returning :*)
+                       sql-format)
+                   {:return-keys true})))
+
 
 (defn get-settings [{tx :tx :as request}]
-  (when-let [settings (-> (sql/select :*)
-                          (sql/from :media_service_settings)
-                          (->> sql-format
-                               (jdbc/query tx)
-                               first))]
-    {:body settings}))
+  (if-let [settings (-> (sql/select :*)
+                        (sql/from :media_service_settings)
+                        (->> sql-format
+                             (jdbc/query tx)
+                             first))]
+    {:body settings}
+    {:body (create-settings)}))
 
 
 (defn update-statement [data]
@@ -45,12 +58,15 @@
                 :patch (set-settings request)
                 )))
 
+(def wrap-settings-query
+  (-> (sql/select :upload_min_part_size :upload_max_part_size)
+      (sql/from :media_service_settings)
+      sql-format))
 
 (defn wrap-assoc-settings [handler]
   (fn [{tx :tx :as request}]
     (handler (assoc request :media-service-settings
-                    (->> ["SELECT * from media_service_settings"]
-                         (jdbc/query tx ) first)))))
+                    (->> wrap-settings-query (jdbc/query tx ) first)))))
 
 (defn init []
   (when-not (-> (sql/select true)
@@ -58,8 +74,4 @@
                 (->> sql-format
                      (jdbc/query @db/ds*)
                      first))
-    (jdbc/execute! @db/ds*
-                   (-> (sql/insert-into :media_service_settings)
-                       (sql/values [{:private_key (pki/gen-key)}])
-                       sql-format)
-                   {:return-keys true})))
+    (create-settings)))

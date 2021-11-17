@@ -1,4 +1,4 @@
-(ns madek.media-service.resources.analyzers.main
+(ns madek.media-service.resources.inspectors.main
   (:refer-clojure :exclude [keyword str])
   (:require
     [clojure.core.async :as async :refer []]
@@ -6,7 +6,7 @@
     [madek.media-service.common.components.misc :refer [wait-component]]
     [madek.media-service.common.http-client.core :as http-client]
     [madek.media-service.icons :as icons]
-    [madek.media-service.resources.analyzers.analyzer.form :as analyzer-form]
+    [madek.media-service.resources.inspectors.inspector.form :as inspector-form]
     [madek.media-service.routes :as routes :refer [path]]
     [madek.media-service.state :as state :refer [debug?* routing-state*]]
     [madek.media-service.utils.core :refer [keyword presence str]]
@@ -35,9 +35,9 @@
       [:pre (with-out-str (pprint @mode*))]]
      ]))
 
-(defn analyzers-component []
+(defn inspectors-component []
   [:div
-   (if-let [analyzers (get-in @data* [(:route @routing-state*) :analyzers])]
+   (if-let [inspectors (get-in @data* [(:route @routing-state*) :inspectors])]
      [:table.table.table-striped.table-sm
       [:thead
        [:tr
@@ -45,14 +45,14 @@
         [:th.text-center "Enabled"]
         [:th.text-center "External"]]]
       [:tbody
-       (for [{id :id :as analyzer} analyzers]
+       (for [{id :id :as inspector} inspectors]
          ^{:key id}
-         [:tr.analyzer
+         [:tr.inspector
           [:td
-           [:a {:href (path :analyzer {:analyzer-id id})}
+           [:a {:href (path :inspector {:inspector-id id})}
             id]]
-          [:td.text-center (str (:enabled analyzer))]
-          [:td.text-center (str (:external analyzer))]])]]
+          [:td.text-center (str (:enabled inspector))]
+          [:td.text-center (str (:external inspector))]])]]
      [wait-component])])
 
 (defn create-button-component [mode*]
@@ -68,7 +68,7 @@
                                   :enabled false
                                   :external true})]
     (fn [mode*]
-      (analyzer-form/form-component
+      (inspector-form/form-component
         form-data* mode*
         :on-cancel #(reset! mode* :view)
         :after-success (fn [_]
@@ -78,14 +78,14 @@
 (defn page []
   (reagent/with-let [mode* (reagent/atom :view)]
     [:div.page
-     {:id :analyzers-page}
+     {:id :inspectors-page}
      (logging/warn "(re-)rendering page")
      [state/hidden-routing-state-component
       :did-change fetch]
      [create-button-component mode*]
-     [:h2 "Analyzers"]
+     [:h2 "Inspectors"]
      (if (#{:create} @mode*)
        [create-component mode*]
-       [analyzers-component])
+       [inspectors-component])
      [debug-component mode*]]))
 

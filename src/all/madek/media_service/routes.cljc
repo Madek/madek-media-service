@@ -18,9 +18,12 @@
            :external true}]
    ["/media-service/" {:authorizers #{:user}}
     ["" :home]
-    ["analyzers/" {:authorizers #{:system-admin}}
-     ["" {:name :analyzers}]
-     [":analyzer-id" {:name :analyzer}]]
+    ["inspections/" {:authorizers ^:replace #{:inspector}}
+     ["" {:name :inspections}]
+     [":inspect-id"  {:name :inspection}]]
+    ["inspectors/" {:authorizers #{:system-admin}}
+     ["" {:name :inspectors}]
+     [":inspector-id" {:name :inspector}]]
     ["originals/"
      [":original-id"
       ["/content" {:name :original-content

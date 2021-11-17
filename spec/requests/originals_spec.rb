@@ -73,9 +73,8 @@ describe "Originals" do
       expect(response.status).to eq(200)
     end
 
-    it "responds with media file details" do
-      expect(without_timestamps(response.body)).to match({
-        id: a_kind_of(String),
+    let(:media_file_response_map) do
+      { id: a_kind_of(String),
         height: nil,
         size: file_size,
         width: nil,
@@ -86,12 +85,17 @@ describe "Originals" do
         guid: nil,
         extension: nil,
         media_type: nil,
+        media_store_type: store.type,
         media_entry_id: nil,
         uploader_id: user.id,
         conversion_profiles: [],
         media_store_id: store.id,
-        sha256: Digest::SHA256.hexdigest(file)
-      }.stringify_keys)
+        sha256: Digest::SHA256.hexdigest(file)}
+    end
+
+    it "responds with media file details" do
+      expect(without_timestamps(response.body)).to \
+        match(media_file_response_map.stringify_keys)
     end
   end
 
