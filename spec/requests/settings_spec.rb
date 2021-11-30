@@ -58,11 +58,11 @@ describe "Resources" do
         end
 
         it "returns settings" do
-          expect(without_timestamps(parsed_body)).to eq({
+          expect(
+            without_timestamps(parsed_body).without("secret")
+            .without("previous_secret").without("secret_rollover_at")
+                ).to eq({
             id: 0,
-            key_private: nil,
-            key_public: nil,
-            key_algo: nil,
             upload_min_part_size: 1024 ** 2,
             upload_max_part_size: 100 * 1024 ** 2,
           }.deep_stringify_keys)
@@ -71,14 +71,10 @@ describe "Resources" do
 
       describe "updating" do
         let(:params) do
-          {
-            id: 0,
-            key_private: "PRIVATE_KEY",
-            key_public: "PUBLIC_KEY",
-            key_algo: nil,
+          { id: 0,
+            secret: "GEHEIM",
             upload_min_part_size: 10 * 1024 ** 2,
-            upload_max_part_size: 12 * 1024 ** 2
-          }
+            upload_max_part_size: 12 * 1024 ** 2 }
         end
         let(:request) { faraday_client_with_token.patch("settings/", params) }
 
@@ -87,13 +83,17 @@ describe "Resources" do
         end
 
         it "updates the settings" do
-          expect(without_timestamps(parsed_body))
-            .to eq(params.stringify_keys)
+          expect(
+            without_timestamps(parsed_body).without("previous_secret")
+            .without("secret_rollover_at")
+                ).to eq(params.stringify_keys)
         end
 
         it "responds with updated settings" do
-          expect(without_timestamps(parsed_body))
-            .to eq(params.stringify_keys)
+          expect(
+            without_timestamps(parsed_body).without("previous_secret")
+            .without("secret_rollover_at")
+                ).to eq(params.stringify_keys)
         end
       end
     end

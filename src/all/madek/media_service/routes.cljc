@@ -27,7 +27,8 @@
     ["originals/"
      [":original-id"
       ["/content" {:name :original-content
-                   :bypass-spa true}]
+                   :bypass-spa true
+                   :authorizers ^:replace #{:original}}]
       ["" :original]]]
     ["settings/" {:authorizers #{:system-admin}}
      ["" {:name :settings}]]

@@ -2,7 +2,9 @@
   (:refer-clojure :exclude [keyword str])
   (:require
     [clojure.java.jdbc :as jdbc]
+    [java-time :refer [instant]]
     [compojure.core :as cpj]
+    [clojure.core.async :refer [go timeout <!]]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
     [honeysql-postgres.helpers :as psqlh]
@@ -11,20 +13,15 @@
     [madek.media-service.routes :as routes :refer [path]]
     [madek.media-service.utils.core :refer [keyword presence str]]
     [madek.media-service.common.pki.keygen :as pki.keygen]
-    [taoensso.timbre :as logging]))
+    [taoensso.timbre :as logging :refer [debug info warn error spy]]))
 
-(def accepted-keys [:key_public :key_private :key_algo :upload_max_part_size :upload_min_part_size])
+(def accepted-keys [:secret :upload_max_part_size :upload_min_part_size])
 
 (defn create-settings []
-  (let [[private-key public-key algo] (pki.keygen/gen-key-pair)]
-    (jdbc/execute! @db/ds*
-                   (-> (sql/insert-into :media_service_settings)
-                       (sql/values [{:key_private private-key
-                                     :key_public public-key
-                                     :key_algo algo}])
-                       (sql/returning :*)
-                       sql-format)
-                   {:return-keys true})))
+  (jdbc/execute!
+    @db/ds*
+    ["INSERT INTO media_service_settings DEFAULT VALUES RETURNING *"]
+    {:return-keys true}))
 
 
 (defn get-settings [{tx :tx :as request}]
@@ -59,7 +56,7 @@
                 )))
 
 (def wrap-settings-query
-  (-> (sql/select :upload_min_part_size :upload_max_part_size)
+  (-> (sql/select :*)
       (sql/from :media_service_settings)
       sql-format))
 
@@ -68,10 +65,29 @@
     (handler (assoc request :media-service-settings
                     (->> wrap-settings-query (jdbc/query tx ) first)))))
 
+
+(defonce rollover-loop-id* (atom nil))
+
+(defn start-rollover-loop []
+  (let [rollover-loop-id (instant)]
+    (reset! rollover-loop-id* rollover-loop-id)
+    (go (while (= rollover-loop-id @rollover-loop-id*)
+          (try
+            (jdbc/execute!
+              @db/ds*
+              [(str "UPDATE media_service_settings "
+                    "SET secret = DEFAULT "
+                    "WHERE secret_rollover_at <= NOW() - interval '24 hours' "
+                    "RETURNING *  ")]
+              {:return-keys true})
+            (catch Exception e (warn e)))
+          (<! (timeout (* 60 60 1000)))))))
+
 (defn init []
   (when-not (-> (sql/select true)
                 (sql/from :media_service_settings)
                 (->> sql-format
                      (jdbc/query @db/ds*)
                      first))
-    (create-settings)))
+    (create-settings))
+  (start-rollover-loop))

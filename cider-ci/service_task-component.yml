@@ -13,7 +13,7 @@ scripts:
       set -euxo
       cd $MADEK_MEDIA_SERVICE_DIR
       mkdir -p $MADEK_MEDIA_SERVICE_DIR/tmp
-      java -jar madek-media-service.jar run --http-server-port $MADEK_MEDIA_SERVICE_HTTP_PORT
+      java -jar madek-media-service.jar server run --http-server-port $MADEK_MEDIA_SERVICE_HTTP_PORT
 
   media-service-is-running:
     body: |

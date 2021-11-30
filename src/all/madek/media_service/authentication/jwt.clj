@@ -43,6 +43,7 @@
     (throw (ex-info "Inspector " id " not found " {:status 403}))))
 
 (defn authentiacate!
+  ; TODO check route too
   [jwt handler {tx :tx :as request}]
   (debug request)
   (let [[header, payload, _] (split jwt ".")

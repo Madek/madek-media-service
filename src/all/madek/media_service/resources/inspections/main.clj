@@ -25,6 +25,14 @@
       (sql/returning :*)
       sql-format))
 
+
+(defn- undo-dispatch-statement [inspection]
+  (-> (sql/update :inspections)
+      (sql/set {:state "pending"})
+      (sql/where [:= :id (:id inspection)])
+      (sql/returning :*)
+      sql-format))
+
 (defn original-token-link [original-id tx]
   ; TODO build full url link with access token
 
@@ -45,6 +53,8 @@
     (let [dispached-inspection (jdbc/execute!
                                  tx (update-statement inspection inspector-id)
                                  {:return-keys true})]
+      ; TODO just for debugging
+      (jdbc/execute! tx (undo-dispatch-statement dispached-inspection))
       {:body {:inspection dispached-inspection}})
     {:body nil
      :status 204}))

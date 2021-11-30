@@ -58,16 +58,16 @@
     :type :number
     :disabled (-> @data* :edit boolean not)
     :reset-default constants/MIN_PART_SIZE_DEFAULT]
-   [forms/input-component data* [url :key_private]
-    :disabled (-> @data* :edit boolean not)
-    :element :textarea
-    :rows (if (:edit @data*) 7 2)]
-   [forms/input-component data* [url :key_public]
-    :disabled (-> @data* :edit boolean not)
-    :element :textarea
-    :rows (if (:edit @data*) 7 2)]
-   [forms/input-component data* [url :key_algo]
+   [forms/input-component data* [url :secret]
+    :type :text
+    :hint (str "A rollover is performed automatically about every 24 hours. "
+               "Changing this too frequently can interrupt encoding services. ")
     :disabled (-> @data* :edit boolean not)]
+   [forms/input-component data* [url :previous_secret]
+    :type :text
+    :disabled true]
+   [forms/input-component data* [url :secret_rollover_at]
+    :disabled true]
    (when (:edit @data*)
      [:div
       [:button.btn.btn-danger.float-left

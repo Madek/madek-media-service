@@ -3,11 +3,11 @@
   (:require
     [clj-yaml.core :as yaml]
     [clojure.java.io :as io]
-    [clojure.tools.logging :as logging]
     [environ.core :refer [env]]
     [madek.media-service.utils.cli-options :refer [long-opt-for-key]]
     [madek.media-service.utils.core :refer [keyword presence str]]
-    [nrepl.server :as nrepl :refer [start-server stop-server]]))
+    [nrepl.server :as nrepl :refer [start-server stop-server]]
+    [taoensso.timbre :as timbre :refer [debug info warn error spy]]))
 
 
 ;;; cli-options ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -21,7 +21,7 @@
 (def options-keys [repl-enable-key repl-bind-key repl-port-key repl-port-file-key])
 
 (def cli-options
-  [[nil (long-opt-for-key repl-enable-key) "start the nREPL server"
+  [["-r" (long-opt-for-key repl-enable-key) "start the nREPL server"
     :default (or (some-> repl-enable-key env yaml/parse-string) true)
     :parse-fn #(yaml/parse-string %)
     :validate [boolean? "Must parse to a boolean"]]
@@ -45,22 +45,25 @@
 
 (defn stop []
   (when @server*
-    (logging/info "stopping nREPL server " @server*)
+    (info "stopping nREPL server " @server*)
     (stop-server @server*)
     (when-let [port-file (repl-port-file-key @options*)]
       (io/delete-file port-file true))
     (reset! server* nil)
     (reset! options* nil)))
 
-(defn init [all-options]
-  (reset! options* (select-keys all-options options-keys))
-  (stop)
-  (when (repl-enable-key @options*)
-    (logging/info "starting nREPL server " @options*)
-    (reset! server*
-            (start-server
-              :bind (repl-bind-key @options*)
-              :port (repl-port-key @options*)))
-    (when-let [port-file (and (repl-enable-key @options*) (repl-port-file-key @options*))]
-      (spit port-file (str (repl-port-key @options*))))
-    (logging/info "started nREPL server ")))
+(defn init [options]
+  (info 'init options)
+  (if @server*
+    (info "repl server ist already running, ignoring init")
+    (do (reset! options* (select-keys options options-keys))
+        (stop)
+        (when (repl-enable-key @options*)
+          (info "starting nREPL server " @options*)
+          (reset! server*
+                  (start-server
+                    :bind (repl-bind-key @options*)
+                    :port (repl-port-key @options*)))
+          (when-let [port-file (and (repl-enable-key @options*) (repl-port-file-key @options*))]
+            (spit port-file (str (repl-port-key @options*))))
+          (info "started nREPL server ")))))
