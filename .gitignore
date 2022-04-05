@@ -2,11 +2,12 @@
 .cpcache
 .java-version
 .nrepl-port
-.shadow-cljs
 .ruby-gemset
+.shadow-cljs
+/inspector
+/target
 log/
 madek-media-service.jar
-madek-media-service_aot.jar
 node_modules/
 pom.xml
 resources/built-info.yml

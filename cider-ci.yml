@@ -22,12 +22,12 @@ jobs:
 
   build-media-service-uberjar:
     name: Build media-service uberjar
-    depends_on: &UBERJAR_DEPENDS
-      backend-unit-tests-passed:
-        type: job
-        job_key: backend-unit-tests
-        states: [passed]
-    run_when: *UBERJAR_DEPENDS
+    run_when: &TEST_PASSED
+     backend-unit-tests-passed:
+       type: job
+       job_key: backend-unit-tests
+       states: [passed]
+#   depends_on: &TEST_PASSED
     context:
       task_defaults:
         environment_variables:

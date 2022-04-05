@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
-set -euxo
-rm -rf resources/media-service/public/js/
-rm -f resources/build-timestamp.txt
+set -eux
+PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
+cd $PROJECT_DIR
+
 rm -f resources/build-timestamp.txt
 rm -f resources/deps.svg
+rm -rf .cpcache
+rm -rf target/
+rm -rf resources/media-service/public/js/

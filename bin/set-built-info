@@ -35,5 +35,4 @@ IO.write(PROJECT_DIR.join("resources").join("built-info.yml"),
           timestamp: DateTime.now.iso8601,
           tree_id: current_tree_id, }.with_indifferent_access.to_h.to_yaml)
 
-
-
+# vi: ft=ruby

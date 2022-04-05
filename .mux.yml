@@ -1,14 +1,14 @@
 name: MADEK/madek/media-service
 windows:
   2:
-    name: back-repl-run
+    name: server-run
     command: |
       export DB_NAME=madek
-      export PGDATAVASE=madek
+      export PGDATABASE=madek
       # export LOGGING_CONFIG_FILE=log-conf-dev.edn
       # we need do wait for the front-end to build the assets before we start up
       sleep 30
-      ./bin/clj-run run
+      ./bin/clj-run server run
   3:
     name: front-repl-run
     command: |

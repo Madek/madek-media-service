@@ -1,7 +1,7 @@
 {:deps {:aliases [:cljs]}
  :builds {:app {:asset-path "/media-service/public/js"
                 :devtools {:http-root "resources/" :http-port 8020}
-                :modules {:main {:init-fn madek.media-service.main/init}}
+                :modules {:main {:init-fn madek.media-service.server.main/init}}
                 :output-dir "resources/media-service/public/js"
                 :module-hash-names true
                 :release {:compiler-options {:optimizations :advanced}}

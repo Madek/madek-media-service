@@ -4,10 +4,6 @@
     [madek.media-service.main]
     ))
 
-; madek.media-service.main requires everything needed to run the backend starting
-; from madek.media-service.main/-main
-
-
 (deftest main-entry-function-exists-test []
   (is (fn? madek.media-service.main/-main)))
 

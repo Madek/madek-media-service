@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-set -eu
-
-set -x
+set -eux
+PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
+cd $PROJECT_DIR
+source $PROJECT_DIR/support/clojure/bin/activate
 
 PROJECT_NAME="madek-media-service"
 JAR_NAME="${PROJECT_NAME}.jar"
-PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
 
 # dirty working tree checking is problematic on CI => disabled for now
 # IGNORE_DIRTY_WORKING_DIR="${IGNORE_DIRTY_WORKING_DIR:-NO}"
@@ -26,7 +26,6 @@ function build {
   ./bin/clean
   rm -f $JAR_NAME
   ./bin/set-built-info
-  source $PROJECT_DIR/clojure/bin/activate
   ./bin/clj-deps-graph
   cp deps.svg resources/media-service/public/
   ./bin/cljs-release-app

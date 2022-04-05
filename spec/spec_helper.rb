@@ -11,11 +11,12 @@ def port
 end
 
 require "./datalayer/config/environment"
-require "config/http_client"
 require "config/helpers"
-require 'config/browser'
+require "config/http_client"
 require "config/session_helper"
-
+require 'config/browser'
+require 'logger'
+logger = Logger.new(STDOUT)
 
 RSpec.configure do |config|
   raise "Run tests in test environment: `RAILS_ENV=test rspec spec/`" unless Rails.env.test?
@@ -45,6 +46,16 @@ RSpec.configure do |config|
   config.around(:each) do |example|
     DatabaseCleaner.cleaning do
       example.run
+    end
+  end
+
+
+  config.after(:each) do |example|
+    unless (ENV['CIDER_CI_TRIAL_ID'].present? or ENV['NOPRY_ON_EXCEPTION'].present?)
+      unless example.exception.nil?
+        logger.warn(example.exception)
+        binding.pry
+      end
     end
   end
 

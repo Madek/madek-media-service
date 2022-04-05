@@ -83,8 +83,8 @@ describe "Settings", type: :feature do
                                    with: default_upload_min_part_size)
       end
 
-      specify "secret field is disabled and has no value" do
-        expect(page).to have_field("secret", type: "text", disabled: true, with: "")
+      specify "secret field is disabled" do
+        expect(page).to have_field("secret", type: "text", disabled: true)
       end
 
       specify "reset values to default buttons are disabled" do
