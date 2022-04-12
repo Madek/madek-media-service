@@ -70,8 +70,9 @@
             (if (time/after? now expiration-time)
               {:status 401 :body "The session has expired!"}
               (handler (assoc request
-                              :authenticated-entity (dissoc user :password_digest)
-                              :authentication-method "Session"
+                              :authenticated-entity (-> user
+                                                        (dissoc :password_digest)
+                                                        (assoc :type :user :method :session))
                               :session-expiration-seconds
                               (in-seconds now expiration-time))))))
         {:status 401 :body "The user was not found!"})

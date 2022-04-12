@@ -25,29 +25,31 @@
                            (sql-format query {:inline true}))
                       {:status 403})))))
 
+(defn authorize-original-user-access! [{:as request}]
+  (warn "TODO authorize-original-user-access!"))
+
 (defn authorize-original-access! [request]
-  (warn 'request request)
-  (case (get-in request [:authenticated-entity :type])
-    :inspector (authorize-original-inspector-access! request)
-    (throw (ex-info "TODO authorize-original-inspector-access!" {:status 599}))))
+  (let [entity-type (get-in request [:authenticated-entity :type])]
+    (case entity-type
+      :inspector (authorize-original-inspector-access! request)
+      :user  (authorize-original-user-access! request)
+      (throw (ex-info (str  "TODO authorize original access for " entity-type) {:status 599})))))
 
 (defn authorize! [handler request]
   (debug 'authorize! request)
   (let [authorizers (get-in request [:route :data :authorizers] #{})]
+    (debug 'authorizers authorizers)
     (doseq [authorizer authorizers]
+      (debug 'authorizer authorizer)
       (case authorizer
-        :admin
-        (when-not (get-in request [:authenticated-entity :is_admin])
-          (throw (ex-info "Admin scope required" {:status 403})))
-        :user
-        (when-not (get-in request [:authenticated-entity :user_id])
-          (throw (ex-info "Sign-in required" {:status 403})))
-        :system-admin
-        (when-not (get-in request [:authenticated-entity :is_system_admin])
-          (throw (ex-info "System-admin scope required" {:status 403})))
-        :inspector
-        (when-not (= :inspector (get-in request [:authenticated-entity :type]))
-          (throw (ex-info "Inspector required" {:status 403})))
+        :admin (when-not (get-in request [:authenticated-entity :is_admin])
+                 (throw (ex-info "Admin scope required" {:status 403})))
+        :user (when-not (get-in request [:authenticated-entity :user_id])
+                (throw (ex-info "Sign-in required" {:status 403})))
+        :system-admin (when-not (get-in request [:authenticated-entity :is_system_admin])
+                        (throw (ex-info "System-admin scope required" {:status 403})))
+        :inspector (when-not (= :inspector (get-in request [:authenticated-entity :type]))
+                     (throw (ex-info "Inspector required" {:status 403})))
         :original (authorize-original-access! request)
         (throw (ex-info (str "Case " authorizer " not handled yet") {:status 404}))))
     (handler request)))

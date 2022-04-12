@@ -10,7 +10,7 @@
     [madek.media-service.server.routes :as routes :refer [path]]
     [madek.media-service.utils.core :refer [keyword presence presence! str]]
     [madek.media-service.utils.daemon :as daemon :refer [defdaemon]]
-    [taoensso.timbre :as logging])
+    [taoensso.timbre :refer [debug info warn error spy] ])
   (:import [java.security MessageDigest]))
 
 (defn next-completed-upload
@@ -122,7 +122,7 @@
     (when-let [completed-upload (next-completed-upload)]
       (jdbc/with-db-transaction [tx @db/ds*]
         (try
-          (logging/info " finishing completed upload " completed-upload)
+          (debug" finishing completed upload " completed-upload)
           (let [reduction (reduce-parts-checksum tx parts completed-upload)]
             (validate-check-sums! completed-upload reduction)
             (let [original (create-original tx (merge completed-upload reduction))
@@ -145,6 +145,6 @@
   (complete-next-upload))
 
 (defn init []
-  (logging/info "Starting db-store complete worker ... ")
+  (info "Starting db-store complete worker ... ")
   (start-complete-db-store-uploads)
-  (logging/info "... started db-store complete worker"))
+  (info "... started db-store complete worker"))

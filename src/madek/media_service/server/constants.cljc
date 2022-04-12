@@ -30,8 +30,9 @@
   {:min-level [[#{
                   ;"madek.media-service.server.routing"
                   ;"madek.media-service.server.resources.inspections.*"
-                  "madek.media-service.server.resources.originals.original.*"
+                  ;"madek.media-service.server.resources.originals.original.*"
                   ;"madek.media-service.server.resources.settings.*"
+                  ;"madek.media-service.server.authorization.main"
                   } :debug]
                [#{"madek.media-service.server.*"} :info]
                [#{"*"} :warn]]

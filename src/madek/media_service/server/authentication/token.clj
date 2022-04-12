@@ -56,7 +56,7 @@
                                       " i.e. to use unsafe http verbs.")}
     :else (handler
             (assoc request
-                   :authenticated-entity (assoc user-token :type "User")))))
+                   :authenticated-entity (assoc user-token :type :user)))))
 
 
 (defn find-token-secret-in-header [request]

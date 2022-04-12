@@ -28,7 +28,7 @@
 
 
 (defn download-original-content [{tx :tx :as request}]
-  (warn 'download-original {:headers (:headers request)})
+  (debug 'download-original {:headers (:headers request)})
   (if-let [original (some-> request get-original :body)]
     (case (:media_store_type original)
       "database" (database-store/download-original-content
