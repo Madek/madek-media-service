@@ -1,4 +1,4 @@
-(ns madek.media-service.server.common.pki.keygen
+(ns madek.media-service.utils.pki.keygen
   (:require
     [clojure.java.shell :as shell :refer [sh]]))
 
@@ -24,10 +24,12 @@
        (when (not= 0 exit)
          (throw (ex-info (str  cmd " shellout error: " err )
                          {:cmd cmd :exit exit :err err})))
-       [private-key public-key (case algo
-                                 :ec256 "es256"
-                                 :ed448 "eddsa"
-                                 :ed25519 "eddsa")]))))
+       {:private-key private-key
+        :public-key public-key
+        :algorithm (case algo
+                     :ec256 "es256"
+                     :ed448 "eddsa"
+                     :ed25519 "eddsa")}))))
 
 
 (comment (gen-key-pair :ed448))

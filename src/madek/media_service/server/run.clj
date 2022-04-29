@@ -75,9 +75,6 @@
   (info 'main [gopts args])
   (let [{:keys [options arguments errors summary]}
         (cli/parse-opts args cli-options :in-order true)
-        cmd (some-> arguments first keyword)
-        pass-on-args (->> [options (rest arguments)]
-                          flatten (into []))
         options (merge (sorted-map) gopts options)]
     (reset! options* options)
     (if (:help options)

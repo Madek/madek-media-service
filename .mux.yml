@@ -17,6 +17,10 @@ windows:
     name: psql
     command: |
       psql -d madek
+  7:
+    name: test
+    command: |
+      bundle
   6:
     name: datalayer
     command: |

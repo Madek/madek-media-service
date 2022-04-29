@@ -3,7 +3,7 @@
     [clojure.pprint :refer [pprint]]
     [clojure.tools.cli :as cli]
     [madek.media-service.inspector.main :as inspector]
-    [madek.media-service.server.logging :as logging]
+    [madek.media-service.utils.logging.main :as service-logging]
     [madek.media-service.server.main :as server]
     [madek.media-service.utils.exit :as exit]
     [madek.media-service.utils.repl :as repl]
@@ -25,7 +25,7 @@
     [["-h" "--help"]
      ["-d" "--dev-mode"]]
     repl/cli-options
-    logging/cli-options))
+    service-logging/cli-options))
 
 
 (defn main-usage [options-summary & more]
@@ -58,7 +58,7 @@
         {:keys [options arguments errors summary]}
         (cli/parse-opts args cli-options :in-order true)
         options (merge (sorted-map) options)]
-    (logging/init options)
+    (service-logging/init options)
     (exit/init options)
     (repl/init options)
     (cond
@@ -72,7 +72,7 @@
 (when @args* (main))
 
 (defn -main [& args]
-  (logging/init {}) ; setup logging with some sensible defaults
+  (service-logging/init {}) ; setup logging with some sensible defaults
   (info '-main [args])
   (reset! args* args)
   (main))

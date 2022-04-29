@@ -26,15 +26,5 @@
                          :eddsa,
                          :rs256, :rs512})
 
-(def DEFAULT_LOGGING_CONFIG
-  {:min-level [[#{
-                  ;"madek.media-service.server.routing"
-                  ;"madek.media-service.server.resources.inspections.*"
-                  ;"madek.media-service.server.resources.originals.original.*"
-                  ;"madek.media-service.server.resources.settings.*"
-                  ;"madek.media-service.server.authorization.main"
-                  } :debug]
-               [#{"madek.media-service.server.*"} :info]
-               [#{"*"} :warn]]
-   :log-level nil})
+
 

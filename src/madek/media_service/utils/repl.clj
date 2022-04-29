@@ -33,9 +33,10 @@
    [nil (long-opt-for-key repl-bind-key) "nREPL bind interface"
     :default (or (some-> repl-bind-key env) "localhost")
     :validate [presence "Must not be present"]]
-   [nil (long-opt-for-key repl-port-file-key ) "write port to this file; NO (or any YAML falsy) disables this"
+   [nil (long-opt-for-key repl-port-file-key) "write port to this file; NO (or any YAML falsy) disables this"
     :default (or (some-> repl-port-file-key env yaml/parse-string) ".nrepl-port")
-    :validate [#(or (false? %) (presence %)) "Must be false or present"]]])
+    :parse-fn yaml/parse-string
+    :validate [#(or (nil? %) (false? %) (presence %)) "Must be nil, false or present"]]])
 
 
 

@@ -12,7 +12,6 @@
     [madek.media-service.server.db :as db]
     [madek.media-service.server.routes :as routes :refer [path]]
     [madek.media-service.utils.core :refer [keyword presence str]]
-    [madek.media-service.server.common.pki.keygen :as pki.keygen]
     [taoensso.timbre :as logging :refer [debug info warn error spy]]))
 
 (def accepted-keys [:secret :upload_max_part_size :upload_min_part_size])

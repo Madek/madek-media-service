@@ -33,24 +33,25 @@
 (defn navbar []
   [:div.mb-3
    [:> bs/Navbar {:bg :light :class :navbar-light}
-    [:> bs/Navbar.Brand {} "Madek Media-Service"]
-    (when-let [user (-> @state* :user)]
-      [:> bs/NavDropdown {:class "ml-auto" :title (str  (:first_name user) " " (:last_name user))}
-       [:> bs/NavDropdown.Item {:href (path :madek-admin)} [icons/admin-interface] " Madek admin interface"]
-       [:> bs/NavDropdown.Item {:href (path :my)} " My archive"]
-       [:> bs/NavDropdown.Item {:href (path :settings)} [icons/admin-interface] " Settings"]
-       [:> bs/NavDropdown.Item {:href (path :inspectors)} [icons/inspectors] " Inspectors "]
-       [:> bs/NavDropdown.Item {:href (path :stores)} [icons/stores] " Media-Stores"]
-       [:> bs/NavDropdown.Item {:href (path :uploads)} [icons/upload] " Upload"]
-       ])]])
+    [:> bs/Container {:class "justify-content-start"}
+     [:> bs/Navbar.Brand {} "Madek Media-Service"]]
+    [:> bs/Container {:class "justify-content-end"}
+     (when-let [user (-> @state* :user)]
+       [:> bs/NavDropdown {:class "ml-auto justify-content-right" :title (str  (:first_name user) " " (:last_name user))}
+        [:> bs/NavDropdown.Item {:href (path :madek-admin)} [icons/admin-interface] " Madek admin interface"]
+        [:> bs/NavDropdown.Item {:href (path :my)} " My archive"]
+        [:> bs/NavDropdown.Item {:href (path :settings)} [icons/admin-interface] " Settings"]
+        [:> bs/NavDropdown.Item {:href (path :inspectors)} [icons/inspectors] " Inspectors "]
+        [:> bs/NavDropdown.Item {:href (path :stores)} [icons/stores] " Media-Stores"]
+        [:> bs/NavDropdown.Item {:href (path :uploads)} [icons/upload] " Upload"]
+        ])]]])
 
 (defn footer []
   [:div
    [:> bs/Navbar {:bg :light :class :navbar-light}
     [:div.container
      [:> bs/Navbar.Brand {} "Madek Media-Service"]
-     [:> bs/Nav.Item
-      {}
+     [:> bs/Nav.Item {}
       [:a {:href constants/REPOSITORY_URL}
        [icons/github] " Madek Media-Service"]
       (when-let [commit-id (some-> @state* :server-state :built-info :commit_id)]

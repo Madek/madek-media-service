@@ -1,0 +1,59 @@
+environment_variables:
+  INSPECTOR_PID_FILE: "{{MADEK_MEDIA_SERVICE_DIR}}/tmp/inspector-process.pid"
+
+scripts:
+
+  inspector-create-config:
+    start_when:
+      uberjar has been built:
+        script_key: build-media-service-uberjar
+    body: |
+      java -jar madek-media-service.jar inspector create-config \
+        --madek-base-url "http://localhost:${MADEK_MEDIA_SERVICE_HTTP_PORT}"
+
+  inspector-show-config:
+    start_when:
+      config has been created has been built:
+        script_key: inspector-create-config
+    body: |
+      cat inspector-config.yml
+
+  inspector-run:
+    start_when:
+      inspector has has been configured:
+        script_key: inspector-create-config
+    body: |
+      set -euxo
+      cd $MADEK_MEDIA_SERVICE_DIR
+      mkdir -p $MADEK_MEDIA_SERVICE_DIR/tmp
+      java -jar madek-media-service.jar inspector run \
+        --pid-file $INSPECTOR_PID_FILE
+
+  inspector-is-running:
+    start_when:
+      inspector is executing:
+        script_key: inspector-run
+        states: [executing]
+    body: |
+      set -euxo
+      until test -f $INSPECTOR_PID_FILE;
+        do sleep 1;
+      done
+
+  test:
+    start_when:
+      inspector is running:
+        script_key: inspector-is-running
+
+  inspector-shutdown:
+    body: |
+      set -euxo
+      cd $MADEK_MEDIA_SERVICE_DIR
+      export PID=$(cat $INSPECTOR_PID_FILE)
+      kill $PID
+      tail --pid=$PID -f /dev/null
+    start_when:
+      test is terminal:
+        script_key: test
+        states: [aborted, defective, passed, failed, skipped]
+

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -eux
+PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
+cd $PROJECT_DIR
+source $PROJECT_DIR/support/clojure/bin/activate
+
+./bin/clj-run --repl-port-file NULL inspector create-config "$@"
+
+# vi: ft=sh

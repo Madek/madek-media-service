@@ -1,13 +1,12 @@
-(ns madek.media-service.inspector.main
+(ns madek.media-service.inspector.run
   (:require
     [clj-pid.core :as pid]
     [clojure.java.io :as io]
     [clojure.pprint :refer [pprint]]
     [clojure.tools.cli :as cli]
-    [madek.media-service.inspector.run :as run]
-    [madek.media-service.inspector.config-file.create :as config-file-create]
-    [madek.media-service.utils.logging.main :as service-logging]
+    [madek.media-service.inspector.config-file.read :as config-file-read]
     [madek.media-service.utils.exit :as exit]
+    [madek.media-service.utils.logging.main :as service-logging]
     [madek.media-service.utils.repl :as repl]
     [signal.handler]
     [taoensso.timbre :as timbre :refer [debug info]]))
@@ -18,14 +17,13 @@
 (def cli-options
   (concat
     [["-h" "--help"]]
-    ))
+    config-file-read/cli-options
+    exit/pid-file-options))
 
 (defn main-usage [options-summary & more]
-  (->> ["Madek Media-Service Inspector"
+  (->> ["Madek Media-Service Inspector run"
         ""
-        "usage: madek-media-service [<opts>] inspector [<inspector-opts>] SCOPE [<scope-opts>] [<args>]"
-        ""
-        "available scopes: run, create-config"
+        "usage: madek-media-service [<opts>] inspector [<inspector-opts>] run [<run-opts>] [<args>]"
         ""
         "Options:"
         options-summary
@@ -42,6 +40,9 @@
   (println (main-usage summary {:args args :options options}))
   (exit/exit))
 
+(defn run [options]
+  (config-file-read/init options)
+  (exit/init options))
 
 (defn main [gopts args]
   (info 'main [gopts args])
@@ -51,8 +52,4 @@
         options (merge (sorted-map) gopts options)]
     (if (:help options)
       (helpnexit summary args options)
-      (case cmd
-        :run (run/main options (rest arguments))
-        :create-config (config-file-create/main options (rest arguments))
-        (helpnexit summary args options)
-        ))))
+      (run options))))

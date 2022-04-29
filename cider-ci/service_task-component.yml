@@ -1,5 +1,5 @@
 environment_variables:
-  PID_FILE: "{{MADEK_MEDIA_SERVICE_DIR}}/tmp/process.pid"
+  MEDIA_SERVICE_PID_FILE: "{{MADEK_MEDIA_SERVICE_DIR}}/tmp/media-service-process.pid"
 
 scripts:
 
@@ -13,7 +13,9 @@ scripts:
       set -euxo
       cd $MADEK_MEDIA_SERVICE_DIR
       mkdir -p $MADEK_MEDIA_SERVICE_DIR/tmp
-      java -jar madek-media-service.jar server run --http-server-port $MADEK_MEDIA_SERVICE_HTTP_PORT
+      java -jar madek-media-service.jar server run \
+        --pid-file $MEDIA_SERVICE_PID_FILE \
+        --http-server-port $MADEK_MEDIA_SERVICE_HTTP_PORT
 
   media-service-is-running:
     body: |
@@ -30,14 +32,14 @@ scripts:
 
   test:
     start_when:
-      admin service is running:
+      service is running:
         script_key: media-service-is-running
 
   shutdown-media-service:
     body: |
       set -euxo
       cd $MADEK_MEDIA_SERVICE_DIR
-      export PID=$(cat tmp/process.pid)
+      export PID=$(cat $MEDIA_SERVICE_PID_FILE)
       kill $PID
       tail --pid=$PID -f /dev/null
     start_when:

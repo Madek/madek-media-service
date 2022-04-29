@@ -1,9 +1,8 @@
-(ns madek.media-service.server.logging
+(ns madek.media-service.utils.logging.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.tools.logging :as logging]
     [environ.core :refer [env]]
-    [madek.media-service.server.constants :as constants]
+    [madek.media-service.utils.logging.core :as logging]
     [madek.media-service.utils.cli-options :refer [long-opt-for-key]]
     [madek.media-service.utils.core :refer [keyword presence str]]
     [taoensso.timbre :as timbre :refer [debug info]]
@@ -38,7 +37,7 @@
 (defn init [all-options]
   (reset! options* (select-keys all-options options-keys))
   (info "initializing logging " @options*)
-  (timbre/merge-config! constants/DEFAULT_LOGGING_CONFIG)
+  (timbre/merge-config! logging/DEFAULT_CONFIG)
   (doseq [configfile (:logging-config-file @options*)]
     (info 'configfile configfile)
     (when-let [content (slurp configfile)]

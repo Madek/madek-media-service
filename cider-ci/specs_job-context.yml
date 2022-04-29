@@ -12,9 +12,9 @@ task_defaults:
     - cider-ci/ruby-bundle_task-component.yml
     - cider-ci/service_task-component.yml
     - cider-ci/uberjar_task-component.yml
+    - cider-ci/inspector_task-component.yml
   traits:
-    JDK 8: true
-    Leiningen 2: true
+    OpenJDK: true
     Firefox ESR 78: true
   ports:
     MADEK_MEDIA_SERVICE_HTTP_PORT:

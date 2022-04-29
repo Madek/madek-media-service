@@ -6,6 +6,7 @@
 .shadow-cljs
 /inspector
 /target
+inspector-config.yml
 log/
 madek-media-service.jar
 node_modules/

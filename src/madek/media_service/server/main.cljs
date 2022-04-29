@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [keyword str])
   (:require
     [madek.media-service.server.html :as html]
-    [madek.media-service.server.logging :as service-logging]
+    [madek.media-service.utils.logging.main :as service-logging]
     [madek.media-service.server.resources.ws-front :as ws]
     [madek.media-service.server.routing :as routing]
     [madek.media-service.server.state :as state]
