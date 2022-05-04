@@ -2,8 +2,9 @@
   (:require
     [clojure.data.codec.base64 :as codec.base64]
     [clojure.java.jdbc :as jdbc]
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
     [madek.media-service.server.authentication.shared :refer [user-base-query]]
-    [madek.media-service.utils.sql :as sql]
     [madek.media-service.utils.digest :as digest]
     [taoensso.timbre :as logging]
     ))
@@ -15,17 +16,23 @@
        (map char)
        (apply str)))
 
+
+(defn query [secret]
+  (-> user-base-query
+      (sql/select [:api_tokens.scope_read :token_scope_read]
+                  [:api_tokens.scope_write :token_scope_write]
+                  [:api_tokens.revoked :token_revoked]
+                  [:api_tokens.description :token_description])
+      (sql/where [:= :api_tokens.token_hash secret])
+      (sql/where [:<> :api_tokens.revoked true])
+      (sql/where [:< :%now :api_tokens.expires_at])
+      (sql/join :api_tokens [:= :users.id :api_tokens.user_id])))
+
+(comment (-> "GeHeim" query (sql-format {:inline true})))
+
 (defn find-user-token-by-some-secret [tx secret]
-  (->> (-> user-base-query
-           (sql/merge-select [:api_tokens.scope_read :token_scope_read]
-                             [:api_tokens.scope_write :token_scope_write]
-                             [:api_tokens.revoked :token_revoked]
-                             [:api_tokens.description :token_description])
-           (sql/merge-where [:= :api_tokens.token_hash secret])
-           (sql/merge-where [:<> :api_tokens.revoked true])
-           (sql/merge-where (sql/raw "now() < api_tokens.expires_at"))
-           (sql/merge-join :api_tokens [:= :users.id :api_tokens.user_id])
-           (sql/format))
+  (->> (-> secret query
+           (sql-format))
        (jdbc/query tx)
        (map #(clojure.set/rename-keys % {:email :email_address}))
        first))

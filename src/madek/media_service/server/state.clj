@@ -3,9 +3,8 @@
   (:require
     [clj-yaml.core :as yaml]
     [clojure.java.io :as io]
-    [java-time]
     [madek.media-service.utils.core :refer [keyword str presence]]
-    [tick.alpha.api :as tick]
+    [tick.core :as t ]
     [taoensso.timbre :as logging]))
 
 (defonce state* (atom {}))
@@ -18,7 +17,7 @@
                        {})]
     (swap! state* assoc :built-info built-info)
     (swap! state* update-in [:built-info :timestamp]
-           #(or % (str(tick/instant))))))
+           #(or % (str (t/now) )))))
 
 
 (defn init []

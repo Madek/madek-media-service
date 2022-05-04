@@ -6,7 +6,6 @@
     [clojure.set :refer [rename-keys]]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [honeysql-postgres.helpers :as psqlh]
     [madek.media-service.server.common.pagination.core :as pagination]
     [madek.media-service.server.db :as db]
     [madek.media-service.server.routes :as routes :refer [path]]

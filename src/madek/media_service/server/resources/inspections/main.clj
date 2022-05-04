@@ -20,7 +20,7 @@
 (defn update-statement [inspection inspector-id]
   (-> (sql/update :inspections)
       (sql/set {:inspector_id inspector-id
-                :state "dispached"})
+                :state "dispatched"})
       (sql/where [:= :id (:id inspection)])
       (sql/returning :*)
       sql-format))
@@ -50,12 +50,13 @@
     {inspector-id :id} :authenticated-entity}]
   (if-let [inspection (-> next-inspection-query sql-format
                           (->> (jdbc/query tx) first))]
-    (let [dispached-inspection (jdbc/execute!
+    (let [dispatched-inspection (jdbc/execute!
                                  tx (update-statement inspection inspector-id)
                                  {:return-keys true})]
       ; TODO just for debugging
-      (jdbc/execute! tx (undo-dispatch-statement dispached-inspection))
-      {:body {:inspection dispached-inspection}})
+      ; (jdbc/execute! tx (undo-dispatch-statement dispatched-inspection))
+      (warn 'dispatched-inspection dispatched-inspection)
+      {:body {:inspection dispatched-inspection}})
     {:body nil
      :status 204}))
 

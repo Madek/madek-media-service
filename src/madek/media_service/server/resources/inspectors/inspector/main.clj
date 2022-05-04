@@ -8,7 +8,7 @@
     [madek.media-service.server.db :as db]
     [madek.media-service.server.routes :as routes :refer [path]]
     [madek.media-service.utils.core :refer [keyword presence str]]
-    [taoensso.timbre :as logging]))
+    [taoensso.timbre :refer [error warn info debug spy]]))
 
 
 (defn get-inspector [{{{inspector-id :inspector-id} :path-params} :route
@@ -17,22 +17,24 @@
                           (sql/from :inspectors)
                           (sql/where [:= :inspectors.id inspector-id])
                           (->> sql-format (jdbc/query tx) first))]
-    (logging/info 'get-inspector inspector)
+    (info 'get-inspector inspector)
     {:body inspector}))
 
 (defn put-inspector
   [{{{inspector-id :inspector-id} :path-params} :route
     body :body tx :tx :as request}]
-  (logging/info 'put-inspector {:request request})
-  (let [res (-> (sql/insert-into :inspectors)
-                (sql/values [(-> body
-                                 (select-keys [:description :enabled :public_key])
-                                 (assoc :id inspector-id))])
+  (info 'put-inspector {:request request})
+  (let [values (-> body
+                   (select-keys [:description :enabled :public_key])
+                   (assoc :id inspector-id))
+        _ (info 'values values)
+        res (-> (sql/insert-into :inspectors)
+                (sql/values [values])
                 (sql/on-conflict :id)
                 (sql/do-update-set :description :enabled :public_key
                                    (sql/where [:= :inspectors.id inspector-id]))
                 (sql-format :inline true)
-                (->> (logging/spy :info))
+                (->> (spy :info))
                 (#(jdbc/execute! tx % {:return-keys true})))]
     {:body res}))
 
@@ -43,7 +45,7 @@
                          (sql/where [:= :inspectors.id inspector-id])
                          sql-format
                          (#(jdbc/execute! tx % {:return-keys true}))
-                         (->> (logging/spy :warn)))]
+                         (->> (spy :warn)))]
     {:status 204}))
 
 (defn handler [{route-name :route-name method :request-method :as request}]

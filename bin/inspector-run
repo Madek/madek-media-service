@@ -4,6 +4,9 @@ PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && p
 cd $PROJECT_DIR
 source $PROJECT_DIR/support/clojure/bin/activate
 
-./bin/clj-run --repl-port-file NULL inspector run "$@"
+rm -f $PROJECT_DIR/.nrepl-inspector-port $PROJECT_DIR/.nrepl-port
+ln -f -v -s  $PROJECT_DIR/.nrepl-inspector-port $PROJECT_DIR/.nrepl-port
+
+./bin/clj-run --repl-port-file .nrepl-inspector-port inspector run "$@"
 
 # vi: ft=sh

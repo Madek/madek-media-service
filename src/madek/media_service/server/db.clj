@@ -5,11 +5,12 @@
     [clojure.tools.logging :as logging]
     [environ.core :refer [env]]
     [hikari-cp.core :as hikari]
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
     [logbug.catcher :as catcher]
     [logbug.debug :as debug :refer [I> I>> identity-with-logging]]
     [logbug.ring :refer [wrap-handler-with-logging]]
     [logbug.thrown :as thrown]
-    [madek.media-service.utils.sql :as sql]
     [madek.media-service.utils.cli-options :refer [long-opt-for-key]]
     [madek.media-service.utils.core :refer [keyword str presence]]
     [pg-types.all]
@@ -156,7 +157,7 @@
 (defn check-pending-migrations [ds]
   (let [run-versions (-> (sql/select :version)
                          (sql/from :schema_migrations)
-                         sql/format
+                         sql-format
                          (->> (jdbc/query ds)
                               (map #(-> % :version Integer.))
                               (into #{})))

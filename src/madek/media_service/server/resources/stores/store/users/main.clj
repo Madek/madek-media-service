@@ -10,7 +10,6 @@
     [madek.media-service.server.routes :as routes :refer [path]]
     [madek.media-service.utils.core :refer [keyword presence str]]
     [madek.media-service.utils.seq :as seq]
-    [madek.media-service.utils.sql]
     [taoensso.timbre :as logging]))
 
 

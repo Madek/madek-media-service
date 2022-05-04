@@ -16,7 +16,7 @@
                   (sql/from :inspections)
                   (sql/where [:= :inspector_id inspector-id])
                   (sql/where [:= :media_file_id media-file-id])
-                  ;TODO (sql/where [:= :state "dispached"])
+                  ;TODO (sql/where [:= :state "dispatched"])
                   )]
     (when-not (-> query
                   sql-format

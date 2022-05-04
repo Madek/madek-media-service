@@ -60,3 +60,7 @@ RSpec.configure do |config|
   end
 
 end
+
+
+require 'require_all'
+require_rel "/features/shared"

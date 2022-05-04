@@ -1,6 +1,7 @@
 (ns madek.media-service.server.resources.inspectors.main
   (:refer-clojure :exclude [keyword str])
   (:require
+    ["date-fns" :as date-fns]
     [clojure.core.async :as async :refer []]
     [clojure.pprint :refer [pprint]]
     [madek.media-service.server.common.components.misc :refer [wait-component]]
@@ -35,6 +36,12 @@
       [:pre (with-out-str (pprint @mode*))]]
      ]))
 
+(defn last-seen-at-comp [inspector]
+  [:span
+   (when-let [last-seen (some-> inspector
+                                :last_seen_at js/Date.)]
+     (date-fns/formatDistance last-seen (js/Date.) (clj->js {:addSuffix true})))])
+
 (defn inspectors-component []
   [:div
    (if-let [inspectors (get-in @data* [(:route @routing-state*) :inspectors])]
@@ -43,7 +50,7 @@
        [:tr
         [:th "Id"]
         [:th.text-center "Enabled"]
-        [:th.text-center "External"]]]
+        [:th.text-center "Last seen at"]]]
       [:tbody
        (for [{id :id :as inspector} inspectors]
          ^{:key id}
@@ -52,7 +59,7 @@
            [:a {:href (path :inspector {:inspector-id id})}
             id]]
           [:td.text-center (str (:enabled inspector))]
-          [:td.text-center (str (:external inspector))]])]]
+          [:td.text-center (last-seen-at-comp inspector)]])]]
      [wait-component])])
 
 (defn create-button-component [mode*]

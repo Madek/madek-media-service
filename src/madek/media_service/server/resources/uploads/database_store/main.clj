@@ -7,7 +7,6 @@
     [byte-streams :refer [to-byte-array]]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [honeysql-postgres.helpers :as psqlh]
     [madek.media-service.server.db :as db]
     [madek.media-service.server.resources.stores.sql :as stores-sql]
     [madek.media-service.server.routes :as routes :refer [path]]

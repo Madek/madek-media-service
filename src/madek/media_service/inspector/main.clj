@@ -4,10 +4,11 @@
     [clojure.java.io :as io]
     [clojure.pprint :refer [pprint]]
     [clojure.tools.cli :as cli]
-    [madek.media-service.inspector.run :as run]
     [madek.media-service.inspector.config-file.create :as config-file-create]
-    [madek.media-service.utils.logging.main :as service-logging]
+    [madek.media-service.inspector.run :as run]
+    [madek.media-service.inspector.state :as state :refer [state*]]
     [madek.media-service.utils.exit :as exit]
+    [madek.media-service.utils.logging.main :as service-logging]
     [madek.media-service.utils.repl :as repl]
     [signal.handler]
     [taoensso.timbre :as timbre :refer [debug info]]))
@@ -49,6 +50,7 @@
         (cli/parse-opts args cli-options :in-order true)
         cmd (some-> arguments first keyword)
         options (merge (sorted-map) gopts options)]
+    (state/set-opts-args options arguments)
     (if (:help options)
       (helpnexit summary args options)
       (case cmd

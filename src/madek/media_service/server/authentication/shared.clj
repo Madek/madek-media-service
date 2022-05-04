@@ -1,6 +1,7 @@
 (ns madek.media-service.server.authentication.shared
   (:require
-    [madek.media-service.utils.sql :as sql]
+    [honey.sql.helpers :as sql]
+    [honey.sql :refer [format] :rename {format sql-format}]
     [taoensso.timbre :as logging]
     ))
 
@@ -12,19 +13,19 @@
         [:users.login :login]
         [:people.first_name :first_name]
         [:people.last_name :last_name]
-        [(sql/call :case [:exists
-                          (-> (sql/select 1)
-                              (sql/from :admins)
-                              (sql/where [:= :admins.user_id :users.id]))
-                          ] true
-                   :else false) :is_admin]
-        [(sql/call :case [:exists
-                          (-> (sql/select 1)
-                              (sql/from :system_admins)
-                              (sql/where [:= :system_admins.user_id :users.id]))
-                          ] true
-                   :else false) :is_system_admin])
-      (sql/merge-join :people [:= :users.person_id :people.id])))
+        [[:case [:exists
+                 (-> (sql/select 1)
+                     (sql/from :admins)
+                     (sql/where [:= :admins.user_id :users.id]))
+                 ] true
+          :else false] :is_admin]
+        [[:case [:exists
+                 (-> (sql/select 1)
+                     (sql/from :system_admins)
+                     (sql/where [:= :system_admins.user_id :users.id]))
+                 ] true
+          :else false] :is_system_admin])
+      (sql/join :people [:= :users.person_id :people.id])))
 
 
-;(sql/format user-base-query)
+(comment (sql-format user-base-query {:inline true}))

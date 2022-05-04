@@ -20,7 +20,7 @@
     ["" :home]
     ["inspections/" {:authorizers ^:replace #{:inspector}}
      ["" {:name :inspections}]
-     [":inspect-id"  {:name :inspection}]]
+     [":inspection-id"  {:name :inspection}]]
     ["inspectors/" {:authorizers #{:system-admin}}
      ["" {:name :inspectors}]
      [":inspector-id" {:name :inspector}]]

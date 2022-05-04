@@ -11,8 +11,10 @@
                   ;"madek.media-service.server.resources.originals.original.*"
                   ;"madek.media-service.server.resources.settings.*"
                   ;"madek.media-service.server.authorization.main"
-                  "madek.media-service.inspector.config-file.*"
+                  ;"madek.media-service.server.authentication.jwt"
+                  ; "madek.media-service.inspector.*"
+                  "madek.media-service.inspector.inspect.exif"
                   } :debug]
-               [#{"madek.media-service.server.*"} :info]
+               [#{"madek.media-service.*"} :info]
                [#{"*"} :warn]]
    :log-level nil})

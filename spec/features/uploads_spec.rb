@@ -35,7 +35,6 @@ describe "Uploads", type: :feature do
 
     it "allows to upload a file" do
       expect(true).to be
-      binding.pry
 
       within "#uploads-page .form" do
         attach_file nil, "spec/support/files/small.txt"

@@ -5,12 +5,13 @@
     [clojure.java.jdbc :as jdbc]
     [clojure.tools.logging :as logging]
     [clojure.walk :refer [keywordize-keys]]
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
     [logbug.catcher :as catcher]
     [logbug.debug]
     [madek.media-service.server.authentication.shared :refer [user-base-query]]
     [madek.media-service.server.legacy.session.encryptor :refer [decrypt]]
     [madek.media-service.server.legacy.session.signature :refer [valid?]]
-    [madek.media-service.utils.sql :as sql]
     ))
 
 (def secret* (atom "secret"))
@@ -18,9 +19,9 @@
 
 (defn query [user-id]
   (-> user-base-query
-      (sql/merge-select :users.password_digest)
-      (sql/merge-where [:= :users.id user-id])
-      (sql/format)))
+      (sql/select :users.password_digest)
+      (sql/where [:= :users.id user-id])
+      sql-format))
 
 (defn- get-user [tx user-id]
   (->> (query user-id)
