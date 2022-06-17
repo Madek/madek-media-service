@@ -15,7 +15,6 @@ describe "Users", type: :feature do
     end
 
     it_displays "authentication error"
-    it_displays "authorization error"
   end
 
   context "for an ordinary user" do

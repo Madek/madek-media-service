@@ -1,4 +1,5 @@
 require 'requests/shared/system_admin_error'
+require "requests/shared/authentication_error.rb"
 
 describe "Resources" do
   describe "Groups: /media-service/stores/:store_id/groups/", type: :request do
@@ -12,7 +13,7 @@ describe "Resources" do
     context "with public access" do
       let(:user) { nil }
 
-      it_raises "system admin error"
+      it_raises "authentication error"
     end
 
     context "for an ordinary user" do

@@ -15,7 +15,7 @@
     [madek.media-service.server.common.http-client.shared :refer [wait-component]]
     [madek.media-service.utils.clipboard :as clipboard]
     [madek.media-service.utils.core :refer [keyword presence str]]
-    [madek.media-service.utils.http.shared :refer [HTTP_UNSAVE_METHODS]]
+    [madek.media-service.utils.http.shared :refer [HTTP_UNSAFE_METHODS]]
     [reagent.core :as reagent]
     [taoensso.timbre :as logging]
     ))
@@ -77,7 +77,7 @@
          [modal-body-inner body]
          [:hr]])
       [:small
-       (if (HTTP_UNSAVE_METHODS (:method request))
+       (if (HTTP_UNSAFE_METHODS (:method request))
          [:p "Please try to send the data again. If that fails use reload button of your browser and send again. "]
          [:p "Please try to reload this page with the reload button of your browser. "])
        [:p [:span

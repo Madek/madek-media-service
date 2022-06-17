@@ -14,8 +14,7 @@ describe "Uploads", type: :feature do
     it "displays modal with authentication error" do
       visit path
       within(".modal") do
-        expect(page).to have_css(".modal-header", text: "Request ERROR 403")
-        expect(page).to have_css(".modal-body", text: "Sign-in required")
+        expect(page).to have_css(".modal-header", text: "Request ERROR 401")
       end
     end
 

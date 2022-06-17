@@ -13,6 +13,7 @@ shared_examples "system admin error" do
   end
 
   it "responds with error message" do
-    expect(response.body).to include("System-admin scope required")
+    expect(response.body).to include("Authorization requirements not satisfied")
+    expect(response.body).to include("system-admin")
   end
 end

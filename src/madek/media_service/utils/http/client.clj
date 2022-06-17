@@ -5,7 +5,7 @@
     [clojure.core.async :refer [go timeout chan <! >! put! take!]]
     [madek.media-service.utils.async]
     [madek.media-service.utils.core :refer [keyword presence str]]
-    [madek.media-service.utils.http.shared :refer [ANTI_CRSF_TOKEN_COOKIE_NAME HTTP_UNSAVE_METHODS HTTP_SAVE_METHODS]]
+    [madek.media-service.utils.http.shared :refer [ANTI_CRSF_TOKEN_COOKIE_NAME HTTP_UNSAFE_METHODS HTTP_SAFE_METHODS]]
     [taoensso.timbre :as timbre :refer [error warn info debug spy]]
     ))
 

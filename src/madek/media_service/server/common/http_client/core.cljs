@@ -16,7 +16,7 @@
     [madek.media-service.server.state :as state :refer [state* routing-state*]]
     [madek.media-service.utils.core :refer [str keyword deep-merge presence]]
     [madek.media-service.utils.http.anti-csrf-front :as anti-csrf]
-    [madek.media-service.utils.http.shared :refer [ANTI_CRSF_TOKEN_COOKIE_NAME HTTP_SAVE_METHODS]]
+    [madek.media-service.utils.http.shared :refer [ANTI_CRSF_TOKEN_COOKIE_NAME HTTP_SAFE_METHODS]]
     [reagent.core :as reagent]
     [taoensso.timbre :as logging]
     ))
@@ -44,7 +44,7 @@
       (as-> data
         (update data :modal-on-request
                 #(if-not (nil? %) %
-                   (if (HTTP_SAVE_METHODS (:method data))
+                   (if (HTTP_SAFE_METHODS (:method data))
                      false true)))
         (update data :modal-on-response-success
                 #(if-not (nil? %) %

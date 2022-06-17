@@ -13,6 +13,8 @@
                   ;"madek.media-service.server.authorization.main"
                   ;"madek.media-service.server.authentication.jwt"
                   ; "madek.media-service.inspector.*"
+                  "madek.media-service.server.authorization.main"
+                  "madek.media-service.server.resources.inspections.inspection.main"
                   "madek.media-service.inspector.inspect.exif"
                   } :debug]
                [#{"madek.media-service.*"} :info]

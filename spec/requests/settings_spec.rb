@@ -1,3 +1,4 @@
+require 'requests/shared/authentication_error'
 require 'requests/shared/system_admin_error'
 
 describe "Resources" do
@@ -26,7 +27,7 @@ describe "Resources" do
 
       # it_raises "authorization error"
       # include_examples "system admin access only"
-      it_raises "system admin error"
+      it_raises "authentication error"
     end
 
     context "for an ordinary user" do

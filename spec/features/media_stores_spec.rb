@@ -16,7 +16,6 @@ describe "Media Stores", type: :feature do
     end
 
     it_displays "authentication error"
-    it_displays "authorization error"
   end
 
   context "for an ordinary user" do
@@ -63,13 +62,13 @@ describe "Media Stores", type: :feature do
     end
 
     specify "page has links to users" do
-      expect(page).to have_link("0", href: "/media-service/stores/legacy-file-store/users/")      
-      expect(page).to have_link("0", href: "/media-service/stores/database/users/")      
+      expect(page).to have_link("0", href: "/media-service/stores/legacy-file-store/users/")
+      expect(page).to have_link("0", href: "/media-service/stores/database/users/")
     end
 
     specify "page has links to groups" do
-      expect(page).to have_link("0", href: "/media-service/stores/legacy-file-store/groups/")      
-      expect(page).to have_link("0", href: "/media-service/stores/database/groups/")      
+      expect(page).to have_link("0", href: "/media-service/stores/legacy-file-store/groups/")
+      expect(page).to have_link("0", href: "/media-service/stores/database/groups/")
     end
   end
 end

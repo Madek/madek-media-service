@@ -1,5 +1,6 @@
-require "requests/uploads/shared/configuration"
+require "requests/shared/authentication_error.rb"
 require "requests/shared/authorization_error"
+require "requests/uploads/shared/configuration"
 
 describe "Uploads", type: :request do
   include_context "configuration"
@@ -56,7 +57,7 @@ describe "Uploads", type: :request do
       let(:user) { nil }
       let(:upload_id) { :not_relevant }
 
-      it_raises "authorization error"
+      it_raises "authentication error"
     end
 
     context "for an ordinary user" do

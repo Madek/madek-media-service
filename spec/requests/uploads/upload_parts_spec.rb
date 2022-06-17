@@ -154,8 +154,8 @@ describe "Uploads", type: :request do
       it "raises the wrapped error" do
         expect { part_1_request }.to raise_error do |error|
           expect(error).to be_an_instance_of(Faraday::ParsingError)
-          expect(error.response.status).to eq(403)
-          expect(error.response.body).to include("Sign-in required")
+          expect(error.response.status).to eq(401)
+          expect(error.response.body).to include("Authentication/Sign-in required")
         end
       end
     end

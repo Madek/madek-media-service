@@ -10,6 +10,7 @@
     [madek.media-service.server.db :as db]
     [madek.media-service.server.http.static-resources :as static-resources]
     [madek.media-service.server.resources.inspections.main :as inspections]
+    [madek.media-service.server.resources.inspections.inspection.main :as inspection]
     [madek.media-service.server.resources.inspectors.inspector.main :as inspector]
     [madek.media-service.server.resources.inspectors.main :as inspectors]
     [madek.media-service.server.resources.originals.original.main :as original]
@@ -56,7 +57,8 @@
 ;;; routing ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def resolve-table
-  {:inspections #'inspections/handler
+  {:inspection #'inspection/handler
+   :inspections #'inspections/handler
    :inspector #'inspector/handler
    :inspectors #'inspectors/handler
    :original #'original/handler

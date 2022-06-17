@@ -1,3 +1,4 @@
+require "requests/shared/authentication_error.rb"
 require "requests/shared/system_admin_error"
 
 describe "Resources" do
@@ -8,7 +9,7 @@ describe "Resources" do
     context "with public access" do
       let(:user) { nil }
 
-      it_raises "system admin error"
+      it_raises "authentication error"
     end
 
     context "for an ordinary user" do

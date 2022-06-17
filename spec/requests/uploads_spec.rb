@@ -1,5 +1,8 @@
-require "requests/uploads/shared/configuration"
+require "requests/shared/authentication_error.rb"
 require "requests/shared/authorization_error"
+require "requests/shared/system_admin_error"
+require "requests/uploads/shared/configuration"
+
 
 describe "Uploads", type: :request do
   include_context "configuration"
@@ -10,7 +13,7 @@ describe "Uploads", type: :request do
     context "with public access" do
       let(:user) { nil }
 
-      it_raises "authorization error"
+      it_raises "authentication error"
     end
 
     context "for an ordinary user" do
@@ -77,7 +80,7 @@ describe "Uploads", type: :request do
     context "with public access" do
       let(:user) { nil }
 
-      it_raises "authorization error"
+      it_raises "authentication error"
     end
 
     context "for an ordinary user" do

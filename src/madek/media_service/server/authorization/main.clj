@@ -1,14 +1,15 @@
 (ns madek.media-service.server.authorization.main
   (:refer-clojure :exclude [keyword str])
   (:require
-    [madek.media-service.utils.core :refer [keyword presence str]]
     [clojure.java.jdbc :as jdbc]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
+    [madek.media-service.utils.core :refer [keyword presence str]]
+    [madek.media-service.utils.http.shared :refer [HTTP_UNSAFE_METHODS HTTP_SAFE_METHODS]]
     [taoensso.timbre :as logging :refer [debug info warn error spy]]
     ))
 
-(defn authorize-original-inspector-access!
+(defn check-original-inspector-access
   [{{inspector-id :id} :authenticated-entity
     {{media-file-id :original-id} :path-params} :route
     tx :tx :as request}]
@@ -18,44 +19,58 @@
                   (sql/where [:= :media_file_id media-file-id])
                   ;TODO (sql/where [:= :state "dispatched"])
                   )]
-    (when-not (-> query
-                  sql-format
-                  (->> (jdbc/query tx) first))
-      (throw (ex-info (str "No valid inspection found "
-                           (sql-format query {:inline true}))
-                      {:status 403})))))
+    (if (-> query sql-format (->> (jdbc/query tx) first))
+      true false)))
 
-(defn authorize-original-user-access! [{:as request}]
-  (warn "TODO authorize-original-user-access!"))
 
-(defn authorize-original-access! [request]
-  (let [entity-type (get-in request [:authenticated-entity :type])]
-    (case entity-type
-      :inspector (authorize-original-inspector-access! request)
-      :user  (authorize-original-user-access! request)
-      (throw (ex-info (str  "TODO authorize original access for " entity-type) {:status 599})))))
+(defn check-admin [request]
+  (get-in request [:authenticated-entity :is_admin]))
 
-(defn authorize! [handler request]
-  (debug 'authorize! request)
-  (let [authorizers (get-in request [:route :data :authorizers] #{})]
-    (debug 'authorizers authorizers)
-    (doseq [authorizer authorizers]
-      (debug 'authorizer authorizer)
-      (case authorizer
-        :admin (when-not (get-in request [:authenticated-entity :is_admin])
-                 (throw (ex-info "Admin scope required" {:status 403})))
-        :user (when-not (get-in request [:authenticated-entity :user_id])
-                (throw (ex-info "Sign-in required" {:status 403})))
-        :system-admin (when-not (get-in request [:authenticated-entity :is_system_admin])
-                        (throw (ex-info "System-admin scope required" {:status 403})))
-        :inspector (when-not (= :inspector (get-in request [:authenticated-entity :type]))
-                     (throw (ex-info "Inspector required" {:status 403})))
-        :original (authorize-original-access! request)
-        (throw (ex-info (str "Case " authorizer " not handled yet") {:status 404}))))
-    (handler request)))
+(defn check-system-admin [request]
+  (get-in request [:authenticated-entity :is_system_admin]))
 
+(defn check-inspector [request]
+  (= :inspector (get-in request [:authenticated-entity :type])))
+
+(defn check-user [request]
+  (boolean (get-in request [:authenticated-entity :user_id])))
+
+(defn check-permitted-user-original [request]
+  (debug 'check-permitted-user-original request)
+  false)
+
+
+(defn check [{route-name :route-name :as request} auth]
+  (debug 'check auth request)
+  (case auth
+    :public true
+    :nobody false
+    :user (check-user request)
+    :inspector (check-inspector request)
+    :permitted-user (case route-name
+                      :original-content (check-permitted-user-original request))
+    :performing-inspector (case route-name
+                            :original-content (check-original-inspector-access request))
+    :admin (check-admin request)
+    :system-admin (check-system-admin request)))
+
+(defn check! [auths request]
+  (debug 'check! auths request)
+  (or (some (partial check request) auths)
+      (if (contains? request :authenticated-entity)
+        (throw (ex-info "Forbidden - Authorization requirements not satisfied"
+                        {:auths auths :status 403}))
+        (throw (ex-info "Unauthorized - Authentication/Sign-in required"
+                        {:status 401})))))
 
 (defn wrap-authorize! [handler]
-  (fn [request] (authorize! handler request)))
-
+  (fn [{request-method :request-method
+        {{auths-http-safe :auths-http-safe
+          auths-http-unsafe :auths-http-unsafe} :data} :route
+        :as request}]
+    (debug request)
+    (condp contains? request-method
+      HTTP_SAFE_METHODS (check! auths-http-safe request)
+      HTTP_UNSAFE_METHODS (check! auths-http-unsafe request))
+    (handler request)))
 

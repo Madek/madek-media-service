@@ -10,52 +10,83 @@
     [taoensso.timbre :as logging]
     ))
 
+
+(def inspections
+  ["inspections/" {:auths-http-safe ^:replace #{:system-admin}
+                   :auths-http-unsafe ^:replace #{:inspector}}
+   ["" {:name :inspections}]
+   [":inspection-id"  {:name :inspection
+                       :auths-http-unsafe ^:replace #{:performing-inspector}}]])
+
+(def inspectors
+  ["inspectors/" {:auths-http-unsafe ^:replace #{:system-admin}
+                  :auths-http-safe ^:replace #{:system-admin}}
+   ["" {:name :inspectors}]
+   [":inspector-id" {:name :inspector}]])
+
+(def originals
+  ["originals/"
+   [":original-id"
+    ["/content" {:name :original-content
+                 :bypass-spa true
+                 :auths-http-safe ^:replace #{:permitted-user
+                                            :performing-inspector}}]
+    ["" :original]]])
+
+(def settings
+  ["settings/" {:auths-http-safe ^:replace #{:system-admin}
+                :auths-http-unsafe ^:replace #{:system-admin}}
+   ["" {:name :settings}]])
+
+(def status
+  ["status" {:name :status
+             :auths-http-unsafe ^:replace #{:nobody}
+             :auths-http-safe ^:replace #{:public}
+             :bypass-spa true}])
+
+(def stores
+  ["stores/" {:auths-http-safe ^:replace #{:system-admin}
+              :auths-http-unsafe ^:replace #{:system-admin}}
+   ["" {:name :stores}]
+   [":store-id"
+    ["" {:name :store}]
+    ["/groups/"
+     ["" {:name :store-groups}]
+     [":group-id" {:name :store-group}]
+     [":group-id/priority" {:name :store-group-priority}]]
+    ["/users/"
+     ["" {:name :store-users}]
+     [":user-id" {:name :store-user}]
+     [":user-id/direct-priority" {:name :store-user-direct-priority}]]]])
+
+(def uploads
+  ["uploads/" {:auths-http-unsafe ^:replace #{:user}}
+   ["" {:name :uploads}]
+   [":upload-id"
+    ["" {:name :upload}]
+    ["/start" {:name :upload-start}]
+    ["/complete" {:name :upload-complete}]
+    ["/parts/"
+     ["" {:name :upload-parts}]
+     [":part" :upload-part]]]])
+
 (def routes
-  [["/" {:name :root}]
+  [["/" {:name :root
+         :auths-http-unsafe #{:nobody}
+         :auths-http-safe #{:public}}]
    ["/admin" {:name :madek-admin
               :external true}]
    ["/my" {:name :my
            :external true}]
-   ["/media-service/" {:authorizers #{:user}}
+   ["/media-service/" {:auths-http-safe ^:replace #{:user}}
     ["" :home]
-    ["inspections/" {:authorizers ^:replace #{:inspector}}
-     ["" {:name :inspections}]
-     [":inspection-id"  {:name :inspection}]]
-    ["inspectors/" {:authorizers #{:system-admin}}
-     ["" {:name :inspectors}]
-     [":inspector-id" {:name :inspector}]]
-    ["originals/"
-     [":original-id"
-      ["/content" {:name :original-content
-                   :bypass-spa true
-                   :authorizers ^:replace #{:original}}]
-      ["" :original]]]
-    ["settings/" {:authorizers #{:system-admin}}
-     ["" {:name :settings}]]
-    ["status" {:name :status
-               :authorizers ^:replace #{}
-               :bypass-spa true}]
-    ["stores/" {:authorizers #{:system-admin}}
-     ["" {:name :stores}]
-     [":store-id"
-      ["" {:name :store}]
-      ["/groups/"
-       ["" {:name :store-groups}]
-       [":group-id" {:name :store-group}]
-       [":group-id/priority" {:name :store-group-priority}]]
-      ["/users/"
-       ["" {:name :store-users}]
-       [":user-id" {:name :store-user}]
-       [":user-id/direct-priority" {:name :store-user-direct-priority}]]]]
-    ["uploads/"
-     ["" {:name :uploads}]
-     [":upload-id"
-      ["" {:name :upload}]
-      ["/start" {:name :upload-start}]
-      ["/complete" {:name :upload-complete}]
-      ["/parts/"
-       ["" {:name :upload-parts}]
-       [":part" :upload-part]]]]
+    inspections
+    inspectors
+    originals
+    settings
+    status
+    stores
+    uploads
     ["ws/" {:name :ws}]]])
 
 (def router (reitit/router routes))

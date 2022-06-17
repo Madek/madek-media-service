@@ -7,7 +7,7 @@ shared_examples "authorization error" do
     visit path
     within(".modal") do
       expect(page).to have_css(".modal-header", text: "Request ERROR 403")
-      expect(page).to have_css(".modal-body", text: "System-admin scope required")
+      expect(page.find(".modal-body")).to have_content("system-admin")
     end
   end
 end

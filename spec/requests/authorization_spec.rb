@@ -1,4 +1,4 @@
-describe "Authorization" do
+describe "Authorization to settings" do
   context "with token" do
     let!(:settings) { create(:media_service_setting) }
     let(:request) { faraday_client_with_token.get("settings/") }
@@ -51,7 +51,7 @@ describe "Authorization" do
         end
 
         it "responds with error message" do
-          expect(response.body).to include("System-admin scope required")
+          expect(response.body).to include("")
         end
       end
 
@@ -62,11 +62,8 @@ describe "Authorization" do
           expect(response.status).to eq(403)
         end
 
-        it "responds with error message" do
-          expect(response.body).to include("System-admin scope required")
-        end
       end
-        
+
       context "for an user with system admin role" do
         let(:user) { create(:user, :with_system_admin_role) }
 
