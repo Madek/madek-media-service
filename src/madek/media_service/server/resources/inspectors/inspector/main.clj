@@ -33,7 +33,7 @@
                 (sql/on-conflict :id)
                 (sql/do-update-set :description :enabled :public_key
                                    (sql/where [:= :inspectors.id inspector-id]))
-                (sql-format :inline true)
+                (sql-format :inline false)
                 (->> (spy :info))
                 (#(jdbc/execute! tx % {:return-keys true})))]
     {:body res}))

@@ -29,6 +29,22 @@
 (defn check-system-admin [request]
   (get-in request [:authenticated-entity :is_system_admin]))
 
+
+(defn check-inspector-inspection-access-query [request]
+  (-> (sql/select true)
+      (sql/from :inspections)
+      (sql/where [:in :inspections.state ["dispatched" "processing"]])
+      (sql/where [:= :inspections.id (get-in request [:route :path-params :inspection-id])])
+      (sql/where [:= :inspections.inspector_id (get-in request [:authenticated-entity :id])])))
+
+(defn check-inspector-inspection-access
+  [{tx :tx :as request}]
+  (and
+    (= :inspector (get-in request [:authenticated-entity :type]))
+    (-> request check-inspector-inspection-access-query
+        (sql-format :inline false)
+        (->> (jdbc/query tx) first spy boolean))))
+
 (defn check-inspector [request]
   (= :inspector (get-in request [:authenticated-entity :type])))
 
@@ -50,7 +66,8 @@
     :permitted-user (case route-name
                       :original-content (check-permitted-user-original request))
     :performing-inspector (case route-name
-                            :original-content (check-original-inspector-access request))
+                            :original-content (check-original-inspector-access request)
+                            :inspection (check-inspector-inspection-access request))
     :admin (check-admin request)
     :system-admin (check-system-admin request)))
 

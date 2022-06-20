@@ -26,7 +26,7 @@
     method :request-method :as request}]
   (case route-name
     :inspection (case method
-                  :patch (-> request get-inspection)
-                  :get (-> request update-inspection)
+                  :patch (-> request update-inspection)
+                  :get (-> request get-inspection)
                   {:status 405})
     {:status 404}))

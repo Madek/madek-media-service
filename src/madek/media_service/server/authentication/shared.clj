@@ -27,5 +27,3 @@
           :else false] :is_system_admin])
       (sql/join :people [:= :users.person_id :people.id])))
 
-
-(comment (sql-format user-base-query {:inline true}))
