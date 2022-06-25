@@ -1,7 +1,6 @@
 (ns madek.media-service.server.resources.stores.main
   (:refer-clojure :exclude [keyword str])
   (:require
-    [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
@@ -9,6 +8,8 @@
     [madek.media-service.server.resources.stores.sql :as stores-sql]
     [madek.media-service.server.routes :as routes :refer [path]]
     [madek.media-service.utils.core :refer [keyword presence str]]
+    [next.jdbc :as jdbc]
+    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
     [taoensso.timbre :as logging]))
 
 
@@ -33,7 +34,7 @@
 
 (defn stores [{tx :tx :as request}]
   {:body {:stores (-> stores-query sql-format
-                      (->> (jdbc/query tx)))}})
+                      (->> (jdbc-query tx)))}})
 
 
 (def handler

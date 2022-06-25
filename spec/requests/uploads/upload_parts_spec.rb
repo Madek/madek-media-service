@@ -127,7 +127,7 @@ describe "Uploads", type: :request do
           it "2nd call responds with upload details with 'failed' state "\
             "but without sha256 and media_file_id values and with error" do
             upload_get_request
-            sleep 1 # ugly!
+            sleep 2 # ugly!
             response_body = upload_get_request.body
             expect(without_timestamps(response_body)).to match({
               id: upload_id,

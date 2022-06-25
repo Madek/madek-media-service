@@ -1,15 +1,16 @@
 (ns madek.media-service.server.routes
   (:refer-clojure :exclude [keyword str])
   (:require
-    [reitit.core :as reitit]
-    ;    [bidi.bidi :as bidi]
-    ;[bidi.verbose :refer [branch param leaf]]
+    [clojure.string :as string]
     [madek.media-service.utils.core :refer [keyword presence str]]
     [madek.media-service.utils.query-params :as utils-query-params]
-    [clojure.string :as string]
-    [taoensso.timbre :as logging]
-    ))
+    [reitit.coercion]
+    [reitit.coercion.schema :as reitit-schema]
+    [reitit.core :as reitit]
+    [schema.core :as schema]
+    [taoensso.timbre :as logging]))
 
+(def coerce-params reitit.coercion/coerce!)
 
 (def inspections
   ["inspections/" {:auths-http-safe ^:replace #{:system-admin}
@@ -26,7 +27,8 @@
 
 (def originals
   ["originals/"
-   [":original-id"
+   [":original-id" {:coercion reitit.coercion.schema/coercion
+                    :parameters {:path {:original-id schema/Uuid}}}
     ["/content" {:name :original-content
                  :bypass-spa true
                  :auths-http-safe ^:replace #{:permitted-user
@@ -52,17 +54,22 @@
     ["" {:name :store}]
     ["/groups/"
      ["" {:name :store-groups}]
-     [":group-id" {:name :store-group}]
-     [":group-id/priority" {:name :store-group-priority}]]
+     [":group-id" {:coercion reitit.coercion.schema/coercion
+                   :parameters {:path {:group-id schema/Uuid}}}
+      ["" {:name :store-group}]
+      ["/priority" {:name :store-group-priority}]]]
     ["/users/"
      ["" {:name :store-users}]
-     [":user-id" {:name :store-user}]
-     [":user-id/direct-priority" {:name :store-user-direct-priority}]]]])
+     [":user-id" {:coercion reitit.coercion.schema/coercion
+                  :parameters {:path {:user-id schema/Uuid}}}
+      ["" {:name :store-user}]
+      ["/direct-priority" {:name :store-user-direct-priority}]]]]])
 
 (def uploads
   ["uploads/" {:auths-http-unsafe ^:replace #{:user}}
    ["" {:name :uploads}]
-   [":upload-id"
+   [":upload-id" {:coercion reitit.coercion.schema/coercion
+                  :parameters {:path {:upload-id schema/Uuid}}}
     ["" {:name :upload}]
     ["/start" {:name :upload-start}]
     ["/complete" {:name :upload-complete}]
@@ -89,7 +96,8 @@
     uploads
     ["ws/" {:name :ws}]]])
 
-(def router (reitit/router routes))
+(def router (reitit/router routes
+                           {:compile reitit.coercion/compile-request-coercers}))
 
 (def routes-flattened (reitit/routes router))
 

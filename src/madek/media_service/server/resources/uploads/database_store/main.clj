@@ -1,16 +1,16 @@
 (ns madek.media-service.server.resources.uploads.database-store.main
   (:refer-clojure :exclude [keyword str])
   (:require
-    [clojure.java.jdbc :as jdbc]
+    [byte-streams :refer [to-byte-array]]
     [clojure.java.io :as io]
     [compojure.core :as cpj]
-    [byte-streams :refer [to-byte-array]]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [madek.media-service.server.db :as db]
     [madek.media-service.server.resources.stores.sql :as stores-sql]
     [madek.media-service.server.routes :as routes :refer [path]]
     [madek.media-service.utils.core :refer [keyword presence presence! str]]
+    [next.jdbc :as jdbc]
+    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
     [taoensso.timbre :as logging]))
 
 
@@ -31,7 +31,7 @@
                        (sql/returning :*)
                        sql-format
                        ;(->> (logging/spy :info))
-                       (#(jdbc/execute! tx % {:return-keys true})))]
+                       (#(jdbc/execute-one! tx % {:return-keys true})))]
     (when-not (or (= md5 (:md5 saved-part))
                   (= sha256 (:sha256 saved-part)))
       (throw (ex-info "Digest does not match" {:status 422})))

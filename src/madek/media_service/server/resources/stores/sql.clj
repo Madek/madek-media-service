@@ -1,7 +1,6 @@
 (ns madek.media-service.server.resources.stores.sql
   (:refer-clojure :exclude [keyword str])
   (:require
-    [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]

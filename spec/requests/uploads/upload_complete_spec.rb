@@ -55,7 +55,7 @@ describe "Uploads", type: :request do
 
     context "with public access" do
       let(:user) { nil }
-      let(:upload_id) { :not_relevant }
+      let(:upload_id) { '00000000-0000-0000-0000-000000000000' }
 
       it_raises "authentication error"
     end

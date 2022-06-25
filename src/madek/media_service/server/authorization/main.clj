@@ -1,7 +1,8 @@
 (ns madek.media-service.server.authorization.main
   (:refer-clojure :exclude [keyword str])
   (:require
-    [clojure.java.jdbc :as jdbc]
+    [next.jdbc :as jdbc]
+    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
     [madek.media-service.utils.core :refer [keyword presence str]]
@@ -19,7 +20,7 @@
                   (sql/where [:= :media_file_id media-file-id])
                   ;TODO (sql/where [:= :state "dispatched"])
                   )]
-    (if (-> query sql-format (->> (jdbc/query tx) first))
+    (if (-> query sql-format (->> (jdbc-query tx) first))
       true false)))
 
 
@@ -43,7 +44,7 @@
     (= :inspector (get-in request [:authenticated-entity :type]))
     (-> request check-inspector-inspection-access-query
         (sql-format :inline false)
-        (->> (jdbc/query tx) first spy boolean))))
+        (->> (jdbc-query tx) first spy boolean))))
 
 (defn check-inspector [request]
   (= :inspector (get-in request [:authenticated-entity :type])))

@@ -18,6 +18,7 @@
   com.codahale.metrics/metrics-healthchecks {:mvn/version "3.0.2"}
   com.fzakaria/slf4j-timbre {:mvn/version "0.3.21"}
   com.github.seancorfield/honeysql {:mvn/version "2.2.868"}
+  com.github.seancorfield/next.jdbc {:mvn/version "1.2.772"}
   com.lucasbradstreet/cljs-uuid-utils {:mvn/version "1.0.2"}
   com.taoensso/sente {:mvn/version "1.16.2"}
   com.taoensso/timbre {:mvn/version "5.2.1"}

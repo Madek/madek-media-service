@@ -79,8 +79,15 @@
 
 (defn route-resolve [handler request]
   (debug 'route-resolve (:uri request))
-  (if-let [route (routes/route (:uri request))]
-    (let [{{route-name :name} :data} route]
+  (if-let [route (some-> request :uri
+                         routes/route)]
+    (let [{{route-name :name} :data} route
+          params-coerced (routes/coerce-params route)
+          ; replace plain :path-params with coerced ones
+          route (update route :path-params
+                        #(merge {} % (:path params-coerced)))]
+      (debug 'route route)
+      (debug 'route-coreced-params params-coerced)
       (debug "route match" route-name)
       (handler (-> request
                    (assoc
@@ -137,7 +144,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn build-routes []
-  (-> ;I> wrap-handler-with-logging
+  (I> wrap-handler-with-logging
       not-found-handler
       wrap-route-dispatch
       ;(logbug.ring/wrap-handler-with-logging :info)

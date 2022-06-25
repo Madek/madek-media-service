@@ -2,7 +2,8 @@
   (:require
     [clj-time.core :as time]
     [clj-time.format :as time-format]
-    [clojure.java.jdbc :as jdbc]
+    [next.jdbc :as jdbc]
+    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
     [clojure.tools.logging :as logging]
     [clojure.walk :refer [keywordize-keys]]
     [honey.sql :refer [format] :rename {format sql-format}]
@@ -12,7 +13,9 @@
     [madek.media-service.server.authentication.shared :refer [user-base-query]]
     [madek.media-service.server.legacy.session.encryptor :refer [decrypt]]
     [madek.media-service.server.legacy.session.signature :refer [valid?]]
-    ))
+    )
+  (:import
+    [java.util UUID]))
 
 (def secret* (atom "secret"))
 (def validity-duration-secs* (atom (* 1 60 60 24 7)))
@@ -20,12 +23,12 @@
 (defn query [user-id]
   (-> user-base-query
       (sql/select :users.password_digest)
-      (sql/where [:= :users.id user-id])
+      (sql/where [:= :users.id (UUID/fromString user-id)])
       sql-format))
 
 (defn- get-user [tx user-id]
   (->> (query user-id)
-       (jdbc/query tx)
+       (jdbc-query tx)
        first))
 
 (defn- session-signature-valid? [user session-object]

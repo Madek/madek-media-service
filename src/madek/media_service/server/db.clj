@@ -1,7 +1,6 @@
 (ns madek.media-service.server.db
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.java.jdbc :as jdbc]
     [clojure.tools.logging :as logging]
     [environ.core :refer [env]]
     [hikari-cp.core :as hikari]
@@ -13,13 +12,25 @@
     [logbug.thrown :as thrown]
     [madek.media-service.utils.cli-options :refer [long-opt-for-key]]
     [madek.media-service.utils.core :refer [keyword str presence]]
+    [next.jdbc :as jdbc]
+    [next.jdbc.connection :as connection]
+    [next.jdbc.result-set :as jdbc-rs]
     [pg-types.all]
-    [ring.util.codec])
+    [ring.util.codec]
+    [taoensso.timbre :refer [debug info warn error spy]]
+    )
   (:import
-    [java.net URI]
-    [com.codahale.metrics MetricRegistry]
-    [com.codahale.metrics.health HealthCheckRegistry]
+    [com.zaxxer.hikari HikariDataSource]
     ))
+
+
+;;; ds* ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defonce ^:private ds* (atom nil))
+
+(defn get-ds []
+  (jdbc/with-options @ds*
+    {:builder-fn jdbc-rs/as-unqualified-lower-maps}))
 
 
 ;;; options and cli ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -39,7 +50,8 @@
 (def cli-options
   [[nil (long-opt-for-key db-name-key) "Database name, falls back to PGDATABASE"
     :default (or (some-> db-name-key env)
-                 (some-> :pgdatabase env))
+                 (some-> :pgdatabase env)
+                 "madek")
     :validate [presence "Must be present"]]
    [nil (long-opt-for-key db-port-key) "Database port, falls back to PGPORT or 5432"
     :default (or (some-> db-port-key env Integer/parseInt)
@@ -70,166 +82,66 @@
 
 
 
-;;; metrics ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defonce metric-registry* (atom nil))
-
-(defn Timer->map [t]
-  {:count (.getCount t)
-   :mean-reate (.getMeanRate t)
-   :one-minute-rate (.getOneMinuteRate t)
-   :five-minute-rate (.getFiveMinuteRate t)
-   :fifteen-minute-rate (.getFifteenMinuteRate t)
-   })
-
-(defn status []
-  {:gauges (->>
-             @metric-registry* .getGauges
-             (map (fn [[n g]] [n (.getValue g)]))
-             (into {}))
-   :timers (->> @metric-registry* .getTimers
-                (map (fn [[n t]] [n (Timer->map t)]))
-                (into {}))})
-
-
-;;; health checks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defonce health-check-registry* (atom nil))
-
-(defn HealthCheckResult->m [r]
-  {:healthy? (.isHealthy r)
-   :message (.getMessage r)
-   :error (.getError r)
-   })
-;(.getNames @health-check-registry*)
-;(.runHealthChecks @health-check-registry*)
-
-(defn health-checks []
-  (some->> @health-check-registry*
-           .runHealthChecks
-           (map (fn [[n r]]
-                  [n (-> r HealthCheckResult->m)]))
-           (into {})))
-
-
-;;; ds ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defonce ds* (atom nil))
-(defn get-ds [] @ds*)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn wrap-tx [handler]
   (fn [request]
-    (jdbc/with-db-transaction [tx @ds*]
+    (jdbc/with-transaction [tx @ds*]
       (try
-        (let [resp (handler (assoc request :tx tx))]
-          (when-let [status (:status resp)]
-            (when (>= status 400 )
-              (logging/warn "Rolling back transaction because error status " status)
-              (jdbc/db-set-rollback-only! tx)))
-          resp)
+        (let [tx-with-opts  (jdbc/with-options tx {:builder-fn jdbc-rs/as-unqualified-lower-maps})]
+          (let [resp (handler (assoc request :tx tx-with-opts))]
+            (when-let [status (:status resp)]
+              (when (>= status 400 )
+                (logging/warn "Rolling back transaction because error status " status)
+                (.rollback tx)))
+            resp))
         (catch Throwable th
-          (logging/warn "Rolling back transaction because of " (.getMessage th) " " th)
-          (jdbc/db-set-rollback-only! tx)
+          (logging/warn "Rolling back transaction because of " (.getMessage th))
+          (debug (.get-cause th))
+          (.rollback tx)
           (throw th))))))
 
-(declare ^:dynamic after-tx)
 
-(defn wrap-after-tx [handler]
-  (fn [request]
-    (let [response (handler request)]
-      (doseq [hook (:after-tx response)] (hook))
-      response)))
 
-(defn files->versions [dir]
-  (-> dir
-      clojure.java.io/file
-      file-seq
-      (->> (filter #(and (.isFile %)
-                         (= (.getParent %) dir)))
-           (map (fn [f]
-                  (-> f
-                      .getName
-                      (clojure.string/split #"_")
-                      first
-                      Integer.)))
-           (into #{}))))
-
-(defn check-pending-migrations [ds]
-  (let [run-versions (-> (sql/select :version)
-                         (sql/from :schema_migrations)
-                         sql-format
-                         (->> (jdbc/query ds)
-                              (map #(-> % :version Integer.))
-                              (into #{})))
-        migrations-dirs ["database/db/migrate" "database/db/migrate_new"]
-        files-versions (reduce
-                         (fn [agg dir] (clojure.set/union agg (files->versions dir)))
-                         #{} migrations-dirs)
-        pending-versions (clojure.set/difference files-versions run-versions)]
-    (if-not (empty? pending-versions)
-      (throw (Exception. "pending migrations!")))))
+;;; init ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn close []
   (when @ds*
     (do
       (logging/info "Closing db pool ...")
-      (-> @ds* :datasource hikari/close-datasource)
+      (.close ^HikariDataSource @ds*)
+
       (reset! ds* nil)
       (logging/info "Closing db pool done."))))
 
-(defn init [all-options]
-  (reset! options* (select-keys all-options options-keys))
+(defn init-ds [db-options]
   (close)
-  (reset! metric-registry* (MetricRegistry.))
-  (reset! health-check-registry* (HealthCheckRegistry.))
-  (logging/info "Initializing db pool " @options* " ..." )
-  (reset!
-    ds*
-    {:datasource
-     (hikari/make-datasource
-       {:auto-commit        true
-        :read-only          false
-        :connection-timeout 30000
-        :validation-timeout 5000
-        :idle-timeout       (* 1 60 1000) ; 1 minute
-        :max-lifetime       (* 1 60 60 1000) ; 1 hour
-        :minimum-idle       (db-min-pool-size-key @options*)
-        :maximum-pool-size  (db-max-pool-size-key @options*)
-        :pool-name          "db-pool"
-        :adapter            "postgresql"
-        :username           (db-user-key @options*)
-        :password           (db-password-key @options*)
-        :database-name      (db-name-key @options*)
-        :server-name        (db-host-key @options*)
-        :port-number        (db-port-key @options*)
-        :register-mbeans    false
-        :metric-registry @metric-registry*
-        :health-check-registry @health-check-registry*})})
-  (check-pending-migrations @ds*)
-  (logging/info "initialized db pool" @ds*)
-  @ds*)
+  (let [ds (connection/->pool
+             HikariDataSource
+             {:dbtype "postgres"
+              :dbname (get db-options db-name-key)
+              :username (get db-options db-user-key)
+              :password (get db-options db-password-key)
+              :host (get db-options db-host-key)
+              :port (get db-options db-port-key)
+              :maximumPoolSize  (get db-options db-max-pool-size-key)
+              :minimumIdle       (get db-options db-min-pool-size-key)
+              :autoCommit true
+              :connectionTimeout 30000
+              :validationTimeout 5000
+              :idleTimeout       (* 1 60 1000) ; 1 minute
+              :maxLifetime       (* 1 60 60 1000) ; 1 hour
+              })]
+    ;; this code initializes the pool and performs a validation check:
+    (.close (jdbc/get-connection ds))
+    (reset! ds* ds)
+    @ds*))
 
-(defn wrap-tx [handler]
-  (fn [request]
-    (jdbc/with-db-transaction [tx @ds*]
-      (try
-        (let [resp (handler (assoc request :tx tx))]
-          (when-let [status (:status resp)]
-            (when (>= status 400 )
-              (logging/warn "Rolling back transaction because error status " status)
-              (jdbc/db-set-rollback-only! tx)))
-          resp)
-        (catch Throwable th
-          (logging/warn "Rolling back transaction because of " (.getMessage th))
-          (logging/debug th)
-          (jdbc/db-set-rollback-only! tx)
-          (throw th))))))
-
-
-;;;;;
-
-(defn execute!
-  ([db sql-params]
-   (execute! db sql-params {:return-keys true}))
-  ([db sql-params opts]
-   (jdbc/execute! db sql-params opts)))
+(defn init
+  ([options]
+   (let [db-options (select-keys options options-keys)]
+     (info "Initializing db " db-options)
+     (init-ds db-options)
+     (info "Initialized db " @ds*)
+     @ds*)))

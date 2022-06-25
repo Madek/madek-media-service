@@ -1,13 +1,14 @@
 (ns madek.media-service.server.resources.inspectors.inspector.main
   (:refer-clojure :exclude [keyword str])
   (:require
-    [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
     [madek.media-service.server.db :as db]
     [madek.media-service.server.routes :as routes :refer [path]]
     [madek.media-service.utils.core :refer [keyword presence str]]
+    [next.jdbc :as jdbc]
+    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
     [taoensso.timbre :refer [error warn info debug spy]]))
 
 
@@ -16,7 +17,7 @@
   (when-let [inspector (-> (sql/select :inspectors.*)
                           (sql/from :inspectors)
                           (sql/where [:= :inspectors.id inspector-id])
-                          (->> sql-format (jdbc/query tx) first))]
+                          (->> sql-format (jdbc-query tx) first))]
     (info 'get-inspector inspector)
     {:body inspector}))
 
@@ -35,7 +36,7 @@
                                    (sql/where [:= :inspectors.id inspector-id]))
                 (sql-format :inline false)
                 (->> (spy :info))
-                (#(jdbc/execute! tx % {:return-keys true})))]
+                (#(jdbc/execute-one! tx % {:return-keys true})))]
     {:body res}))
 
 (defn delete-inspector
@@ -44,7 +45,7 @@
   (when-let [deleted (-> (sql/delete-from :inspectors)
                          (sql/where [:= :inspectors.id inspector-id])
                          sql-format
-                         (#(jdbc/execute! tx % {:return-keys true}))
+                         (#(jdbc/execute-one! tx % {:return-keys true}))
                          (->> (spy :warn)))]
     {:status 204}))
 

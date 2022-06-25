@@ -74,11 +74,10 @@ describe "Originals" do
     end
 
     let(:media_file_response_map) do
-      { id: a_kind_of(String),
+      { id: original_id,
         height: nil,
         size: file_size,
         width: nil,
-        access_hash: nil,
         meta_data: nil,
         content_type: "text/plain",
         filename: "small.txt",
@@ -88,7 +87,6 @@ describe "Originals" do
         media_store_type: store.type,
         media_entry_id: nil,
         uploader_id: user.id,
-        conversion_profiles: [],
         media_store_id: store.id,
         sha256: Digest::SHA256.hexdigest(file)}
     end

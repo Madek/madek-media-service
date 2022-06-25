@@ -4,7 +4,6 @@
     [buddy.core.codecs.base64 :as b64]
     [cheshire.core :as json]
     [clojure.data.codec.base64 :as codec.base64]
-    [clojure.java.jdbc :as jdbc]
     [cuerdas.core :as string :refer [lower split]]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]

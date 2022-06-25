@@ -3,10 +3,11 @@
   (:require
     [buddy.core.keys :as keys]
     [buddy.sign.jwt :as jwt]
-    [clojure.java.jdbc :as jdbc]
+    [next.jdbc :as jdbc]
+    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [madek.media-service.server.db :refer [ds*]]
+    [madek.media-service.server.db :refer [get-ds]]
     [madek.media-service.utils.core :refer [keyword presence presence! str]]
     [madek.media-service.utils.query-params :refer [encode-primitive]]
     [taoensso.timbre :refer [debug info warn error spy]]))
@@ -35,7 +36,7 @@
   (-> (sql/select :public_key :private_key)
       (sql/from :media_service_settings)
       sql-format
-      (->> (jdbc/query @ds*) first)
+      (->> (jdbc-query (get-ds)) first)
       (update :private_key prepare-key-str)
       (update :private_key private-key!)
       (update :public_key prepare-key-str)

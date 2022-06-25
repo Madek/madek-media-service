@@ -6,15 +6,7 @@
 
 (def DEFAULT_CONFIG
   {:min-level [[#{
-                  ;"madek.media-service.inspector.*"
-                  ;"madek.media-service.server.authentication.jwt"
-                  ;"madek.media-service.server.authorization.main"
-                  ;"madek.media-service.server.resources.inspections.*"
-                  ;"madek.media-service.server.resources.originals.original.*"
-                  ;"madek.media-service.server.resources.settings.*"
-                  ;"madek.media-service.server.routing"
-                  "madek.media-service.server.resources.inspections.inspection.main"
-                  "madek.media-service.inspector.inspect.exif"
+                  ;"madek.media-service.server.authentication.nonces"
                   } :debug]
                [#{"madek.media-service.*"} :info]
                [#{"*"} :warn]]

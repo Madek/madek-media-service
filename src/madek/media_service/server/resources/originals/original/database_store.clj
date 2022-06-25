@@ -2,13 +2,14 @@
   (:refer-clojure :exclude [keyword str])
   (:require
     [clj-yaml.core :as yaml]
-    [clojure.java.jdbc :as jdbc]
     [clojure.string :as string]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [madek.media-service.server.db :as db]
+    [madek.media-service.server.db :refer [get-ds]]
     [madek.media-service.utils.core :refer [keyword presence presence! str]]
     [madek.media-service.utils.query-params :refer [encode-primitive]]
+    [next.jdbc :as jdbc]
+    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
     [org.httpkit.server :as http-server]
     [taoensso.timbre :refer [debug info warn error spy]])
   (:import [java.nio ByteBuffer]))
@@ -21,7 +22,7 @@
   (-> (sql/from :media_file_parts)
       (sql/select :blob)
       (sql/where [:= :id (:id part)])
-      (->> sql-format (jdbc/query @db/ds*) first :blob)))
+      (->> sql-format (jdbc-query (get-ds)) first :blob)))
 
 (defn next-part [i original]
   (some->
@@ -29,7 +30,7 @@
     (sql/select :*)
     (sql/where [:= :media_file_id (:id original)])
     (sql/where [:= :part i])
-    (->>  sql-format (jdbc/query @db/ds*) first)))
+    (->>  sql-format (jdbc-query (get-ds)) first)))
 
 (defn content-disposition-header [original request]
   (when  (-> request :query-params-parsed :download)

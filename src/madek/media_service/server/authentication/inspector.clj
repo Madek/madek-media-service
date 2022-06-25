@@ -6,7 +6,8 @@
     [buddy.sign.jwt :as jwt]
     [cheshire.core :as json]
     [clojure.data.codec.base64 :as codec.base64]
-    [clojure.java.jdbc :as jdbc]
+    [next.jdbc :as jdbc]
+    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
     [cuerdas.core :as string :refer [lower split]]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
@@ -29,7 +30,7 @@
       (sql/do-update-set :last_ping_at
                          (sql/where [:= :inspector_pings.inspector_id id]))
       (sql-format {:inline false})
-      (#(jdbc/execute! tx % {:return-keys true}))
+      (#(jdbc/execute-one! tx % {:return-keys true}))
       :last_ping_at))
 
 (defn authenticate-inspector! [id algo jwt tx]
@@ -38,7 +39,7 @@
                          (sql/from :inspectors)
                          (sql/where [:= :id id])
                          sql-format
-                         (->> (jdbc/query tx) first))]
+                         (->> (jdbc-query tx) first))]
     (do (when-not (:enabled inspector)
           (throw (ex-info (str "Inspector with id " id " is not enabled")
                           {:status 403})))

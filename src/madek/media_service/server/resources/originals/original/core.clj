@@ -2,7 +2,6 @@
   (:refer-clojure :exclude [keyword str])
   (:require
     [clj-yaml.core :as yaml]
-    [clojure.java.jdbc :as jdbc]
     [clojure.string :as string]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]

@@ -34,8 +34,7 @@
 
 (defn handler [request]
   (let [memory-status (check-memory-usage)
-        body (json/write-str {:memory memory-status
-                              :db-pool (db/status)})]
+        body (json/write-str {:memory memory-status})]
     {:status (if (and (->> [memory-status]
                            (map :ok?)
                            (every? true?)))

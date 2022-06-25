@@ -1,17 +1,17 @@
 (ns madek.media-service.server.resources.uploads.main
   (:refer-clojure :exclude [keyword str])
   (:require
-    [clojure.java.jdbc :as jdbc]
+    [byte-streams :refer [to-byte-array]]
     [clojure.java.io :as io]
     [compojure.core :as cpj]
-    [byte-streams :refer [to-byte-array]]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [madek.media-service.server.db :as db]
     [madek.media-service.server.resources.stores.sql :as stores-sql]
     [madek.media-service.server.resources.uploads.database-store.main :as database-store]
     [madek.media-service.server.routes :as routes :refer [path]]
     [madek.media-service.utils.core :refer [keyword presence presence! str]]
+    [next.jdbc :as jdbc]
+    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
     [taoensso.timbre :as logging :refer [debug info warn error spy]]))
 
 
@@ -38,7 +38,7 @@
 
 (defn announce-upload [{tx :tx :as request}]
   (if-let [upload (-> request insert-upload-sql sql-format
-                      (#(jdbc/execute! tx % {:return-keys true})))]
+                      (#(jdbc/execute-one! tx % {:return-keys true})))]
     {:body upload}
     (throw (ex-info "anouncing upload failed" {}))))
 
@@ -53,21 +53,25 @@
    {:stores (-> stores-sql/users-media-store-priority-query
                 (sql/where [:= :user_id user-id])
                 sql-format
-                (->> (jdbc/query tx)
+                (->> (jdbc-query tx)
                      (map (fn [store]
                             (merge {}
                                    (select-keys media-service-settings [:upload_min_part_size :upload_max_part_size])
                                    store)))))}})
 
+
+(defn upload-query [upload-id uploader-id]
+  (-> (sql/select :*)
+      (sql/from :uploads)
+      (sql/where [:= :id upload-id])
+      (sql/where [:= :uploader_id uploader-id])))
+
 (defn get-upload! [{{{upload-id :upload-id} :path-params} :route
-                    current-user :authenticated-entity
+                    {user-id :user_id} :authenticated-entity
                     tx :tx :as request}]
-  (if-let [upload (-> (sql/select :*)
-                      (sql/from :uploads)
-                      (sql/where [:= :id upload-id])
-                      (sql/where [:= :uploader_id (-> current-user :user_id presence!)])
-                      sql-format
-                      (->> (jdbc/query tx) first))]
+  (if-let [upload (-> (upload-query upload-id user-id)
+                      (sql-format :inline false)
+                      (->> (jdbc-query tx) first))]
     {:body upload}
     (throw (ex-info "upload not found (or user not permitted)" {:status 404}))))
 
@@ -90,7 +94,7 @@
                    (sql/where [:= :id upload-id])
                    (sql/returning :*)
                    sql-format
-                   (#(jdbc/execute! tx % {:return-keys true})))]
+                   (#(jdbc/execute-one! tx % {:return-keys true})))]
     (when-not (= state (:state upload))
       (throw (ex-info "state change failed" {:status 422})))
     upload))
@@ -125,7 +129,7 @@
                       (sql/where [:= :uploads.id upload-id])
                       (sql/where [:= :uploads.uploader_id current-user-id])
                       (sql/where [:= :uploads.state "started"])
-                      sql-format (->> spy (jdbc/query tx) first))]
+                      sql-format (->> spy (jdbc-query tx) first))]
     (case (:media_store_type upload)
       "database" (database-store/put-part upload request)
       (throw (ex-info "media-store type not supported yet" {:status 500})))
@@ -136,6 +140,7 @@
 ;;; handler ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn handler [{route-name :route-name method :request-method :as request}]
+  (debug 'request request)
   (case route-name
     :upload (case method
               :get (get-upload! request))

@@ -1,7 +1,8 @@
 (ns madek.media-service.server.authentication.token
   (:require
     [clojure.data.codec.base64 :as codec.base64]
-    [clojure.java.jdbc :as jdbc]
+    [next.jdbc :as jdbc]
+    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
     [madek.media-service.server.authentication.shared :refer [user-base-query]]
@@ -33,7 +34,7 @@
 (defn find-user-token-by-some-secret [tx secret]
   (->> (-> secret query
            (sql-format))
-       (jdbc/query tx)
+       (jdbc-query tx)
        (map #(clojure.set/rename-keys % {:email :email_address}))
        first))
 

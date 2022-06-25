@@ -1,7 +1,6 @@
 (ns madek.media-service.server.common.pagination.core
   (:refer-clojure :exclude [keyword str])
   (:require
-    [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]

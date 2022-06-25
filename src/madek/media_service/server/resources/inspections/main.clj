@@ -1,11 +1,12 @@
 (ns madek.media-service.server.resources.inspections.main
   (:refer-clojure :exclude [keyword str])
   (:require
-    [clojure.java.jdbc :as jdbc]
+    [next.jdbc :as jdbc]
+    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
     [compojure.core :as cpj]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [madek.media-service.server.db :refer [ds*]]
+    [madek.media-service.server.db :refer [get-ds]]
     [madek.media-service.server.routes :as routes :refer [path]]
     [madek.media-service.utils.core :refer [keyword presence str]]
     [taoensso.timbre :refer [debug info warn error spy]]))
@@ -39,18 +40,17 @@
   )
 
 (comment (some-> next-inspection-query sql-format
-                 (->> (jdbc/query @ds*) first)
+                 (->> (jdbc-query (get-ds)) first)
                  :media_file_id
-                 (original-token-link @ds*)
-                 ))
+                 (original-token-link (get-ds))))
 
 
 (defn dispatch-inspection
   [{tx :tx :as request
     {inspector-id :id} :authenticated-entity}]
   (if-let [inspection (-> next-inspection-query sql-format
-                          (->> (jdbc/query tx) first))]
-    (let [dispatched-inspection (jdbc/execute!
+                          (->> (jdbc-query tx) first))]
+    (let [dispatched-inspection (jdbc/execute-one!
                                  tx (update-statement inspection inspector-id)
                                  {:return-keys true})]
       ; TODO just for debugging
