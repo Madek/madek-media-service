@@ -15,7 +15,7 @@
     [next.jdbc :as jdbc]
     [next.jdbc.connection :as connection]
     [next.jdbc.result-set :as jdbc-rs]
-    [pg-types.all]
+    ;[pg-types.all]
     [ring.util.codec]
     [taoensso.timbre :refer [debug info warn error spy]]
     )
