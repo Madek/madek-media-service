@@ -40,7 +40,8 @@
                          (sql/where [:= :id id])
                          sql-format
                          (->> (jdbc-query tx) first))]
-    (do (when-not (:enabled inspector)
+    (do (debug "validating inspector: " inspector)
+        (when-not (:enabled inspector)
           (throw (ex-info (str "Inspector with id " id " is not enabled")
                           {:status 403})))
         (let [pub-key (public-key! (:public_key inspector))]

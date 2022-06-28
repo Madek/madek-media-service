@@ -72,12 +72,13 @@
                    (go (let [resp (<! (request/send-processing-update*
                                         job
                                         {:state :processing
-                                         :started_at start-time}))]
+                                         :madek.media-service.inspector.inspect.exifstarted_at start-time
+                                         :updated_at (instant)}))]
                          (debug 'update-resp resp)))
                    (if-not (.isAlive (:proc exif-proc))
                      (try (debug "run! check pipe")
                           (run! bp/check pipe)
-                          (let [res (-> pipe spy last spy :out spy slurp spy from-json doall)]
+                          (let [res (-> pipe spy last spy :out spy slurp spy from-json spy last)]
                             (debug 'res res)
                             (put! ch res))
                           (catch Exception e

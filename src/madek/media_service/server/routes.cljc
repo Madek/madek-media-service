@@ -16,8 +16,10 @@
   ["inspections/" {:auths-http-safe ^:replace #{:system-admin}
                    :auths-http-unsafe ^:replace #{:inspector}}
    ["" {:name :inspections}]
-   [":inspection-id"  {:name :inspection
-                       :auths-http-unsafe ^:replace #{:performing-inspector}}]])
+   [":inspection-id"  {:coercion reitit.coercion.schema/coercion
+                       :parameters {:path {:inspection-id schema/Uuid}}}
+    ["" {:name :inspection
+         :auths-http-unsafe ^:replace #{:performing-inspector}}]]])
 
 (def inspectors
   ["inspectors/" {:auths-http-unsafe ^:replace #{:system-admin}

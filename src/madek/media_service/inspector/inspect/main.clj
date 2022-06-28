@@ -32,7 +32,7 @@
                     (info "received job " job)
                     ; TODO timeout exif/inspect* somewhere ... here?
                     (let [insp-res (<? (exif/inspect* job))]
-                      (warn "PUT RES " insp-res)))
+                      (warn "PUT RES " (str insp-res))))
               (warn "Unexpected response code for response " resp)))
           (catch Exception e
             (error e)))

@@ -1,12 +1,13 @@
-(ns madek.media-service.utils.logging.core
-  (:refer-clojure :exclude [str keyword])
+(ns madek.media-service.utils.logging.core (:refer-clojure :exclude [str keyword])
   (:require
     [madek.media-service.utils.core :refer [keyword presence str]]
     [taoensso.timbre :as timbre :refer [debug info]]))
 
 (def DEFAULT_CONFIG
   {:min-level [[#{
-                  ;"madek.media-service.server.authentication.nonces"
+                  ; "madek.media-service.server.routing"
+                  "madek.media-service.inspector.inspect.exif"
+                  "madek.media-service.server.resources.inspections.inspection.main"
                   } :debug]
                [#{"madek.media-service.*"} :info]
                [#{"*"} :warn]]

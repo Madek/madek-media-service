@@ -4,7 +4,7 @@
     [clojure.contrib.humanize :as humanize]
     [clojure.data.json :as json]
     [logbug.debug :as debug]
-    [madek.media-service.server.db :as db]
+    [madek.media-service.server.db.main :as db]
     [madek.media-service.utils.core :refer [keyword presence str]]
     [taoensso.timbre :as logging]))
 

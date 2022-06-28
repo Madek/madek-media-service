@@ -3,7 +3,7 @@
     [clojure.pprint :refer [pprint]]
     [clojure.tools.cli :as cli]
     [environ.core :refer [env]]
-    [madek.media-service.server.db :as db]
+    [madek.media-service.server.db.main :as db]
     [madek.media-service.server.http.server :as http-server]
     [madek.media-service.server.resources.inspectors.main :as inspectors]
     [madek.media-service.server.resources.settings.main :as settings]

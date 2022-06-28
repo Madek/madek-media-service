@@ -2,7 +2,7 @@
   (:require
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [madek.media-service.server.db :refer [get-ds]]
+    [madek.media-service.server.db.main :refer [get-ds]]
     [next.jdbc :as jdbc]
     [taoensso.timbre :as logging :refer [debug info warn error spy]])
   (:import

@@ -4,7 +4,7 @@
     [clojure.java.io :as io]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [madek.media-service.server.db :as db]
+    [madek.media-service.server.db.main :as db]
     [madek.media-service.server.resources.originals.original.database-store :as database-store]
     [madek.media-service.server.resources.stores.sql :as stores-sql]
     [madek.media-service.server.routes :as routes :refer [path]]

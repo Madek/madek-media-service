@@ -1,7 +1,6 @@
-(ns madek.media-service.server.db
+(ns madek.media-service.server.db.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.tools.logging :as logging]
     [environ.core :refer [env]]
     [hikari-cp.core :as hikari]
     [honey.sql :refer [format] :rename {format sql-format}]
@@ -10,12 +9,12 @@
     [logbug.debug :as debug :refer [I> I>> identity-with-logging]]
     [logbug.ring :refer [wrap-handler-with-logging]]
     [logbug.thrown :as thrown]
+    [madek.media-service.server.db.type-conversions]
     [madek.media-service.utils.cli-options :refer [long-opt-for-key]]
     [madek.media-service.utils.core :refer [keyword str presence]]
     [next.jdbc :as jdbc]
     [next.jdbc.connection :as connection]
     [next.jdbc.result-set :as jdbc-rs]
-    ;[pg-types.all]
     [ring.util.codec]
     [taoensso.timbre :refer [debug info warn error spy]]
     )
@@ -93,11 +92,11 @@
           (let [resp (handler (assoc request :tx tx-with-opts))]
             (when-let [status (:status resp)]
               (when (>= status 400 )
-                (logging/warn "Rolling back transaction because error status " status)
+                (warn "Rolling back transaction because error status " status)
                 (.rollback tx)))
             resp))
         (catch Throwable th
-          (logging/warn "Rolling back transaction because of " (.getMessage th))
+          (warn "Rolling back transaction because of " (.getMessage th))
           (debug (.get-cause th))
           (.rollback tx)
           (throw th))))))
@@ -109,11 +108,11 @@
 (defn close []
   (when @ds*
     (do
-      (logging/info "Closing db pool ...")
+      (info "Closing db pool ...")
       (.close ^HikariDataSource @ds*)
 
       (reset! ds* nil)
-      (logging/info "Closing db pool done."))))
+      (info "Closing db pool done."))))
 
 (defn init-ds [db-options]
   (close)

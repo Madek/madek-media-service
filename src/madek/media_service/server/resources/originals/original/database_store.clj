@@ -5,7 +5,7 @@
     [clojure.string :as string]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [madek.media-service.server.db :refer [get-ds]]
+    [madek.media-service.server.db.main :refer [get-ds]]
     [madek.media-service.utils.core :refer [keyword presence presence! str]]
     [madek.media-service.utils.query-params :refer [encode-primitive]]
     [next.jdbc :as jdbc]

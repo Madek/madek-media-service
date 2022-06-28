@@ -3,7 +3,7 @@
     [clojure.pprint :refer [pprint]]
     [clojure.tools.cli :as cli]
     [environ.core :refer [env]]
-    [madek.media-service.server.db :as db]
+    [madek.media-service.server.db.main :as db]
     [madek.media-service.server.run :as run]
     [madek.media-service.utils.exit :as exit]
     [taoensso.timbre :as timbre :refer [debug info warn error spy]]))

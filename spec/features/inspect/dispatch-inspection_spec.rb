@@ -16,9 +16,9 @@ describe "JPG inspection", type: :feature do
           inspection = Inspection.where(media_file_id: upload_id).first
           expect(inspection).to be
           wait_until(30) do
-            inspection.reload[:state] == 'dispatched'
+            ['dispatched', 'processing'].include? inspection.reload[:state]
           end
-          binding.pry
+          # binding.pry
         end
 
       end

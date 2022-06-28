@@ -20,7 +20,7 @@
                   (sql/where [:= :media_file_id media-file-id])
                   ;TODO (sql/where [:= :state "dispatched"])
                   )]
-    (if (-> query sql-format (->> (jdbc-query tx) first))
+    (if (-> query spy sql-format spy (->> (jdbc-query tx) first))
       true false)))
 
 

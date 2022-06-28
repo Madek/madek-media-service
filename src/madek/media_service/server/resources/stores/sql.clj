@@ -4,7 +4,7 @@
     [compojure.core :as cpj]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [madek.media-service.server.db :as db]
+    [madek.media-service.server.db.main :as db]
     [madek.media-service.server.routes :as routes :refer [path]]
     [madek.media-service.utils.core :refer [keyword presence str]]
     [taoensso.timbre :as logging]))

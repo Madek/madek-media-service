@@ -7,7 +7,7 @@
     [honey.sql.helpers :as sql]
     [java-time :refer [instant]]
     [madek.media-service.server.constants :refer [MAX_PART_SIZE_LIMIT]]
-    [madek.media-service.server.db :refer [get-ds]]
+    [madek.media-service.server.db.main :refer [get-ds]]
     [madek.media-service.server.routes :as routes :refer [path]]
     [madek.media-service.utils.core :refer [keyword presence str]]
     [next.jdbc :as jdbc]

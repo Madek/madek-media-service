@@ -5,7 +5,7 @@
     [clojure.set :refer [rename-keys]]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [madek.media-service.server.db :refer [get-ds]]
+    [madek.media-service.server.db.main :refer [get-ds]]
     [madek.media-service.server.routes :as routes :refer [path]]
     [madek.media-service.utils.core :refer [keyword presence presence! str]]
     [madek.media-service.utils.daemon :as daemon :refer [defdaemon]]

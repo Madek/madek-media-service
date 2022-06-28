@@ -7,7 +7,7 @@
     [logbug.ring :refer [wrap-handler-with-logging]]
     [madek.media-service.server.authentication.main :as authentication]
     [madek.media-service.server.authorization.main :as authorization]
-    [madek.media-service.server.db :as db]
+    [madek.media-service.server.db.main :as db]
     [madek.media-service.server.http.static-resources :as static-resources]
     [madek.media-service.server.resources.inspections.main :as inspections]
     [madek.media-service.server.resources.inspections.inspection.main :as inspection]
