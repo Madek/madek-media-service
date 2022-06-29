@@ -2,12 +2,13 @@
   (:require
     [babashka.process :as bp :refer [pipeline pb]]
     [clojure.core.async :refer [go timeout chan <! >! put! take!]]
+    [cuerdas.core :refer [split]]
     [java-time :refer [instant]]
     [madek.media-service.inspector.inspect.request :as request]
     [madek.media-service.inspector.inspect.request :refer [request-job* jwt-token]]
     [madek.media-service.inspector.state :as state :refer [state*]]
     [madek.media-service.utils.async :refer [<? go-try*]]
-    [madek.media-service.utils.json :refer [from-json]]
+    [madek.media-service.utils.json :refer [from-json to-json]]
     [taoensso.timbre :as timbre :refer [error warn debug info spy]])
   (:import [java.util UUID]
            [java.util.concurrent TimeUnit]
@@ -53,6 +54,8 @@
 
 (comment (exif-process-chain-checked-output @last-job*))
 
+(defonce last-res* (atom nil))
+
 
 (comment
   (bp/check (bp/process (curl-cmd @last-job*) {}))
@@ -69,18 +72,28 @@
                    (debug 'proc exif-proc)
                    (debug 'isAlive (.isAlive (:proc exif-proc)))
                    ;(when (zero? (mod counter 10)))
-                   (go (let [resp (<! (request/send-processing-update*
+                   (go (let [resp (<! (request/send-patch-update*
                                         job
                                         {:state :processing
-                                         :madek.media-service.inspector.inspect.exifstarted_at start-time
+                                         :started_at start-time
                                          :updated_at (instant)}))]
                          (debug 'update-resp resp)))
                    (if-not (.isAlive (:proc exif-proc))
                      (try (debug "run! check pipe")
                           (run! bp/check pipe)
                           (let [res (-> pipe spy last spy :out spy slurp spy from-json spy last)]
-                            (debug 'res res)
-                            (put! ch res))
+                            (debug 'res (to-json res))
+                            (reset! last-res* res)
+                            (put! ch {:original {:height (get res :ImageHeight)
+                                                 :width (get res :ImageWidth)
+                                                 :extension (get res :FileTypeExtension)
+                                                 :content_type (get res :MIMEType)
+                                                 :media_type (-> (get res :MIMEType)
+                                                                 (split "/")
+                                                                 first)}
+                                      :exif res
+                                      :state :finished
+                                      }))
                           (catch Exception e
                             (warn e)
                             (put! ch e)))

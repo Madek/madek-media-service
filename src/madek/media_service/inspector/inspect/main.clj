@@ -2,8 +2,9 @@
   (:require
     [babashka.process :as bp :refer [pipeline pb]]
     [clojure.core.async :refer [go timeout chan <! >! put! take!]]
+    [java-time :refer [instant]]
     [madek.media-service.inspector.inspect.exif :as exif]
-    [madek.media-service.inspector.inspect.request :refer [request-job* jwt-token]]
+    [madek.media-service.inspector.inspect.request :refer [request-job* jwt-token send-patch-update*]]
     [madek.media-service.inspector.state :as state :refer [state*]]
     [madek.media-service.utils.async :refer [<? go-try*]]
     [madek.media-service.utils.json :refer [from-json]]
@@ -31,8 +32,13 @@
               200 (let [job (:body resp)]
                     (info "received job " job)
                     ; TODO timeout exif/inspect* somewhere ... here?
-                    (let [insp-res (<? (exif/inspect* job))]
-                      (warn "PUT RES " (str insp-res))))
+                    (let [insp-res (<? (exif/inspect* job))
+                          patch-resp (<? (send-patch-update*
+                                           job
+                                           (merge insp-res
+                                                  {:state :finished })))]
+                      (debug (str insp-res))
+                      (debug patch-resp)))
               (warn "Unexpected response code for response " resp)))
           (catch Exception e
             (error e)))

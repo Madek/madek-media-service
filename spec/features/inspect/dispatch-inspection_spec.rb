@@ -18,7 +18,6 @@ describe "JPG inspection", type: :feature do
           wait_until(30) do
             ['dispatched', 'processing'].include? inspection.reload[:state]
           end
-          # binding.pry
         end
 
       end

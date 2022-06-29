@@ -8,6 +8,7 @@
                   ; "madek.media-service.server.routing"
                   "madek.media-service.inspector.inspect.exif"
                   "madek.media-service.server.resources.inspections.inspection.main"
+                  "madek.media-service.server.resources.inspections.main"
                   } :debug]
                [#{"madek.media-service.*"} :info]
                [#{"*"} :warn]]

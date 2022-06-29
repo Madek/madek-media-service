@@ -56,9 +56,9 @@
         (jwt/sign priv-key {:alg algo})
         (jwt/unsign pub-key {:alg algo}))))
 
-;;; put job update ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; patch inspection update ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn send-processing-update* [job inspection-data]
+(defn send-patch-update* [job inspection-data]
   (let [req {:url (str (state/madek-base-url)
                        (path :inspection {:inspection-id (get-in job [:inspection :id])}))
              :headers {"Authorization" (str "Bearer-JWT " (jwt-token))}
