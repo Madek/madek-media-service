@@ -17,11 +17,19 @@ windows:
     name: psql
     command: |
       psql -d madek
-  7:
-    name: test
-    command: |
-      bundle
+
   6:
     name: datalayer
     command: |
       cd datalayer
+
+  7:
+    name: test
+    command: |
+      bundle
+
+  8:
+    name: inspector
+    command: |
+      ./bin/inspector-run
+

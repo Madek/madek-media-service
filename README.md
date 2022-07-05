@@ -5,9 +5,13 @@ Madek Media Service
 Prototyping
 -----------
 
-Remove all `media_files` etc:
 
-    TRUNCATE TABLE media_files CASCADE;
+TODOs
+------
+
+### Inspections
+
+* Handle situations when an inspection gets lost
 
 
 
@@ -17,35 +21,47 @@ Building, Development & Testing this Project
 
 ### Building
 
-#### Without AOT
+build: `./bin/uberjar`.
 
-To build run `./bin/clj-uberjar`.
-
-Run the uberjar:
-
-    java -cp madek-media-service.jar clojure.main -m madek.media-service.main
-
-#### With AOT
-
-
-To build run `./bin/clj-uberjar-aot`.
-
-Run the uberjar:
-
-    java -jar madek-media-service.jar
 
 
 
 ### Development
 
-#### Running main
+The Media-Service consists of several services like the `server` one or more
+`inspectors` etc.
 
-    clj -m madek.media-service.main
+Invoking `./bin/XYZ-run` relinks `.nrepl-port` to the last started service!
 
 
-#### Create some test files in the old store
+
+#### Run the Server
+
+
+    ./bin/server-run
+
+
+#### Inspector
+
+
+Run: `./bin/inspector-run`
+
+Config: `./bin/inspector-create-config`
+
+
+
+#### Data Management
+
+Create some test files in the old store
 
     FactoryGirl.create :research_video_media_entry,  responsible_user_id: '653bf621-45c8-4a23-a15e-b29036aa9b10'
+
+Remove all `media_files` etc:
+
+    TRUNCATE TABLE media_files CASCADE;
+
+
+
 
 
 Notes
