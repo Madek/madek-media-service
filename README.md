@@ -67,6 +67,27 @@ Remove all `media_files` etc:
 Notes
 -----
 
+
+### Preview creation in V3
+
+```
+    THUMBNAILS = { maximum: nil,
+                   x_large: { width: 1024, height: 768 },
+                   large: { width: 620, height: 500 },
+                   medium: { width: 300, height: 300 },
+                   small_125: { width: 125, height: 125 },
+                   small: { width: 100, height: 100 } }
+```
+
+* see `create_previews!` in `datalayer/app/models/media_file.rb`
+
+* effective conversion see `convert` ind `datalayer/lib/file_conversion.rb`,
+  uses the command `convert` from ImageMagic
+
+
+
+
+
 ### S3 Upload via Browser
 
 TLDR: pre-signed URLs seems likely to work for AWS and other implementations
