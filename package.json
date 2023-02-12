@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "devDependencies": {
-    "npm-check-updates": "^12.5.8",
+    "npm-check-updates": "^16.7.4",
     "shadow-cljs": "^2.18.00"
   },
   "dependencies": {
